@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "lgx"
+version = "0.1.0"
+description = "Logic guided LLM inference"
+authors = ["Xiro28 <grillo383@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+rich = "^14.3.2"
+typechecked = "^0.11.1"
+typeguard = "^4.5.0"
+ollama = "^0.6.1"
+dumbo-asp = "^0.4.0"
+pytest = "^9.0.2"
+pytest-mock = "^3.15.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

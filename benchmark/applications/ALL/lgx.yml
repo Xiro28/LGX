@@ -1,0 +1,122 @@
+context: null
+
+strings:
+- crossing_minimization_description: |
+    Nodes are assigned to layers.
+    Nodes in the same layer have an ordering.
+    Each layer has a width.
+    Edges connect pairs of nodes.
+    The ordering should minimize crossings between edges.
+
+- labyrinth_description: |
+    There is an initial cell and a goal cell.
+    Cells are connected by adjacency relations.
+    Rows and columns can be shifted, modifying the connections.
+    The number of steps is bounded.
+
+- nomystery_description: |
+    Locations are connected by weighted edges.
+    Being at a location and having a fuel amount are state properties.
+    Traversing an edge consumes fuel according to its cost.
+    All goal locations must be reached within the available fuel.
+
+- ricochetrobots_description: |
+    A grid has a fixed dimension.
+    Robots occupy grid cells.
+    Barriers block movement between cells.
+    Movement in a direction continues until a barrier or robot is encountered.
+    A target cell must be reached in a fixed number of moves.
+
+- sokoban_description: |
+    A player and boxes occupy grid cells.
+    Movement is directional.
+    A box is pushed only if the next cell is clear.
+    All boxes must be placed on goal cells.
+    
+extract:
+- problem_name(name): 
+    prompt: |
+        Tell me the name of the problem that best match the text in INPUT.
+        Choose from the following options: [crossing_minimization, labyrinth, nomystery, ricochetrobots, sokoban]
+        
+        
+        Here is a description of each problem:
+        
+        crossing_minimization:
+        {crossing_minimization_description}
+        Predicates: layers/1, width/2, in_layer/2, edge/2        
+        
+        
+        labyrinth:
+        {labyrinth_description}
+        Predicates: field/2, init_on/2, goal_on/2, connect/3, max_steps/1
+        
+        
+        nomystery:
+        {nomystery_description}
+        Predicates: fuelcost/3, at/2, fuel/2, goal/2, step/1
+        
+        
+        ricochetrobots:
+        {ricochetrobots_description}
+        Predicates: dim/1, pos/3, barrier/3, target/3, length/1
+        
+        
+        sokoban:
+        {sokoban_description}
+        Predicates: movedir/3, goal/1, stone/1, player/1, at/2, clear/2
+
+
+# Crossing Minimization predicates
+- width(layer, number_of_nodes): 
+    prompt: |
+        {crossing_minimization_description}
+
+        For each layer, specify the number of nodes.
+    extraction_condition: 
+        - condition: problem_name(crossing_minimization)
+          monotone: true
+
+- in_layer(layer, node): 
+    prompt: | 
+        {crossing_minimization_description}
+        
+        For each layer, list every node that belongs to that layer.
+    extraction_condition: 
+        - condition: problem_name(crossing_minimization)
+          monotone: true
+        - condition: width(_, _)
+          monotone: true
+
+    knowledge_base: |
+        warning(unmatched_layer_size, (Layer,Size,Cnt)) :-  width(Layer,Size),
+        Cnt = #count{Node : in_layer(Layer,Node)}, Size != Cnt.  
+
+        #show warning/2.
+        #show in_layer/2.
+
+- layers(value): 
+    prompt: |
+        {crossing_minimization_description}
+
+        value is the total number of layers.
+    extraction_condition: 
+        - condition: problem_name(crossing_minimization) 
+          monotone: true
+        - condition: in_layer(_, _)
+          monotone: true
+        - condition: not warning(_, _)  
+
+- edge(source, target):
+    prompt: | 
+        {crossing_minimization_description}
+        
+        List all the edges from source to target.
+    extraction_condition: 
+        - condition: problem_name(crossing_minimization) 
+          monotone: true
+        - condition: layers(_)
+          monotone: true 
+
+
+knowledge_base: null
