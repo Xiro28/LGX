@@ -12,14 +12,8 @@ if __name__ == "__main__":
     with open("dataset_final_lnrs.json", "r") as f:
         import json
         data = json.load(f)
-        count = 40
         for item in data:
             prompt = item.get("text")
             result = lgx_instance.infer(prompt).get_extracted_atoms()
-            print(result)
-            print("\n\n")
-            count -= 1
-            if count == 0:
-                break
-            lgx_instance.cleanup()
+            print(f"Question: {prompt}\nExtracted Atoms: {result}\n")
             

@@ -20,7 +20,7 @@ class lgx:
         app_cfg = applicationParser.from_yaml(application_filename)
         beh_cfg = behaviourParser.from_yaml(behaviour_filename)
 
-        llm_inst = llmHandler.create(llm_model, beh_cfg.init, app_cfg, beh_cfg)
+        llm_inst = llmHandler.create(llm_model, app_cfg, beh_cfg)
         
         return cls(llm_instance=llm_inst)    
 

@@ -17,10 +17,9 @@ from src.core.predicate import predicate
 @dataclass(frozen=True)
 class llmHandler:
     llm_model: str
-    system_prompt: str
     application_config: application_configuration
     behaviour_config: behaviour_configuration
-    prompt_database: promptDatabase
+    prompt_database: Optional[promptDatabase]
     predicate_condition_cache: ConditionCache
     _llm_chat_fn: Any 
 
@@ -29,10 +28,16 @@ class llmHandler:
     @classmethod
     def create(cls, 
                llm_model: str, 
-               system_prompt: str, 
                application_cfg: application_configuration, 
                behaviour_cfg: behaviour_configuration) -> "llmHandler":
-        db = promptDatabase.initialize("cached_prompts.db")
+        
+        use_cached_prompts = os.getenv("LGX_ENABLE_PROMPT_CACHE", "true").lower() == "true"
+
+        if use_cached_prompts:
+            database = os.getenv("LGX_USE_DB_FILENAME", "cached_prompts.db")
+            db = promptDatabase.initialize(database)
+        else:
+            db = None
 
         use_condition_cache = os.getenv("LGX_ENABLE_CONDITION_CACHE", "true").lower() == "true"
         condition_cache_mode = os.getenv("LGX_CONDITION_CACHE_MODE", "all").lower()
@@ -49,7 +54,6 @@ class llmHandler:
 
         return cls(
             llm_model=llm_model,
-            system_prompt=system_prompt,
             application_config=application_cfg,
             behaviour_config=behaviour_cfg,
             prompt_database=db,
@@ -58,11 +62,12 @@ class llmHandler:
         )
 
     def __del__(self):
-        self.prompt_database.close()
+        if self.prompt_database is not None:
+            self.prompt_database.close()
 
     def craft_message_history(self, prompt: str, context: str) -> list:
         return [
-            {"role": "system", "content": f"{self.system_prompt}{context}"},
+            {"role": "system", "content": f"{self.behaviour_config.init}{context}"},
             {"role": "user", "content": prompt}
         ]
 
@@ -72,13 +77,14 @@ class llmHandler:
         grammar = class_response.model_json_schema(mode='serialization')
         history = self.craft_message_history(prompt, context)
 
-        query_result = self.prompt_database.get_cached_response(history, self.llm_model, configuration)
-        if query_result:
-            try:
-                return class_response.model_validate_json(query_result[0])
-            except Exception as e:
-                print(e)
-                #self.prompt_database.delete_cached_response(history, self.llm_model, configuration)
+        if self.prompt_database is not None:
+            query_result = self.prompt_database.get_cached_response(history, self.llm_model, configuration)
+            if query_result:
+                try:
+                    return class_response.model_validate_json(query_result[0])
+                except Exception as e:
+                    print(e)
+                    #self.prompt_database.delete_cached_response(history, self.llm_model, configuration)
 
         try:
             llm_response = self._llm_chat_fn(
@@ -89,12 +95,15 @@ class llmHandler:
             )
             
             content = llm_response["message"]["content"]
-            self.prompt_database.cache_response(
-                history, self.llm_model, configuration, content, 
-                llm_response["prompt_eval_count"], 
-                llm_response["eval_count"], 
-                llm_response["total_duration"]
-            )
+
+            if self.prompt_database is not None:
+                self.prompt_database.cache_response(
+                    history, self.llm_model, configuration, content, 
+                    llm_response["prompt_eval_count"], 
+                    llm_response["eval_count"], 
+                    llm_response["total_duration"]
+                )
+
             return class_response.model_validate_json(content)
         except Exception as e:
             logging.error(f"Error invoking/validating LLM: {e}")
@@ -112,8 +121,6 @@ class llmHandler:
                 if not self.predicate_condition_cache.skip_logic_solver(pred.conditions): 
                     # Evaluate the program
                     call_oracle, condition_results = pred.execute_condition(self.atom_database)
-
-                    print(f"Condition evaluation for {pred.defined_predicate}: {condition_results}, oracle call: {call_oracle}")
 
                     for result in condition_results:
                         self.predicate_condition_cache.update(result[0], result[1])

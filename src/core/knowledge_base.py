@@ -29,8 +29,6 @@ class knowledgeBase:
             for line in kb_output.splitlines() 
             if line.strip()
         ]
-
-        print(f"KB execution output:\n{kb_output}\nParsed atoms: {[str(atom) for atom in parsed_atoms]}")
         
         return atomList(atoms=parsed_atoms)
 
