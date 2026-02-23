@@ -79,12 +79,10 @@ class ConditionCache:
                     self.stats["miss_monotone"] += 1
                 else:
                     self.stats["miss_non_monotone"] += 1
-                print("Conditions evaluated to false")
                 return False
 
         self.stats["solver_skip"] += 1
 
-        print(self.stats)
         return True
 
     def get(self, conditions: Union[predicate_condition, List[predicate_condition]]) -> bool:

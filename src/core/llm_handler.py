@@ -113,15 +113,16 @@ class llmHandler:
                     # Evaluate the program
                     call_oracle, condition_results = pred.execute_condition(self.atom_database)
 
-                    print(condition_results)
+                    print(f"Condition evaluation for {pred.defined_predicate}: {condition_results}, oracle call: {call_oracle}")
 
                     for result in condition_results:
                         self.predicate_condition_cache.update(result[0], result[1])
                     
                     if not call_oracle:
                         continue
-                else:
+                elif not self.predicate_condition_cache.get(pred.conditions):
                     continue
+
 
             appl_mapping = behaviour_mapping.replace("{instructions}", f"{pred.prompt_description}")
             appl_mapping = appl_mapping.replace("{atom}", pred.predicate_formatted)
@@ -145,3 +146,7 @@ class llmHandler:
     
     def get_extracted_atoms(self) -> atomList:
         return self.atom_database
+    
+    def cleanup(self):
+        self.atom_database.atoms.clear()
+        self.predicate_condition_cache.clear()

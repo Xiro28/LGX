@@ -36,3 +36,6 @@ class lgx:
     
     def explain(self) -> str:
         raise NotImplementedError("NOT IMPLEMENTED YET")
+    
+    def cleanup(self):
+        self.llm_instance.cleanup()

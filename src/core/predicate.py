@@ -189,7 +189,7 @@ class predicate:
         if self.advanced_prompt_type and self.kb:
             try:
                 # Combine DB atoms with newly extracted atoms for the KB check
-                return self.kb.execute(atoms_database + extracted_atoms)
+                return self.kb.execute(atoms_database, extracted_atoms)
             except Exception as e:
                 logging.error(f"Error executing KB for {self.defined_predicate}: {e}")
         return extracted_atoms

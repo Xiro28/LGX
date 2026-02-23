@@ -12,10 +12,11 @@ from src.core.atom_list import atomList
 class knowledgeBase:
     program: str
 
-    def execute(self, atoms: Optional[atomList] = None) -> atomList:
-        atoms_input = str(atoms) if atoms is not None else ""
+    def execute(self, database_atoms: Optional[atomList] = None, extracted_atoms: Optional[atomList] = None) -> atomList:
+        atoms_input = str(database_atoms) if database_atoms is not None else ""
 
-        print(f"Input: {atoms_input} Program: {self.program}")
+        if extracted_atoms is not None:
+            atoms_input += "\n" + str(extracted_atoms)
         
         kb_output: str = Model.of_program(
             self.program, 
@@ -23,13 +24,13 @@ class knowledgeBase:
             sort=False
         ).as_facts
 
-        print("KB output:", kb_output)
-
         parsed_atoms = [
             atom(line) 
             for line in kb_output.splitlines() 
             if line.strip()
         ]
+
+        print(f"KB execution output:\n{kb_output}\nParsed atoms: {[str(atom) for atom in parsed_atoms]}")
         
         return atomList(atoms=parsed_atoms)
 
