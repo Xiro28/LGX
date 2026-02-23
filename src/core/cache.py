@@ -34,11 +34,11 @@ class ConditionCache:
         return self.cache_mode in ("all", "non_monotone")
 
     def _select_cache(self, condition: predicate_condition) -> Dict[str, bool] | None:
-        if condition.is_monotone and self._use_monotone_cache():
+        if condition.monotone and self._use_monotone_cache():
             return self.monotone_cache
-        if not condition.is_monotone and self._use_non_monotone_cache():
+        if not condition.monotone and self._use_non_monotone_cache():
             return self.non_monotone_cache
-        return None
+        return None 
 
     def update(self, condition: list[predicate_condition] | predicate_condition, value: bool) -> None:
         if not self.enabled:
@@ -50,11 +50,11 @@ class ConditionCache:
         for cond in condition:
             cache = self._select_cache(cond)
             if cache is not None:
-                cache[condition.condition()] = value
+                cache[cond.condition] = value
 
-    def skip_logic_solver(self,conditions: Union[predicate_condition, List[predicate_condition]]) -> bool:
+    def skip_logic_solver(self,conditions: Union[predicate_condition, List[predicate_condition], None]) -> bool:
 
-        if not self.enabled:
+        if not self.enabled or conditions is None:
             return False
 
         if isinstance(conditions, predicate_condition):
@@ -70,18 +70,21 @@ class ConditionCache:
                 return False
 
             if key in cache:
-                if condition.is_monotone:
+                if condition.monotone:
                     self.stats["hit_monotone"] += 1
                 else:
                     self.stats["hit_non_monotone"] += 1
             else:
-                if condition.is_monotone:
+                if condition.monotone:
                     self.stats["miss_monotone"] += 1
                 else:
                     self.stats["miss_non_monotone"] += 1
+                print("Conditions evaluated to false")
                 return False
 
         self.stats["solver_skip"] += 1
+
+        print(self.stats)
         return True
 
     def get(self, conditions: Union[predicate_condition, List[predicate_condition]]) -> bool:
@@ -95,7 +98,7 @@ class ConditionCache:
         result = True
 
         for condition in conditions:
-            key = condition.condition()
+            key = condition.condition
             if not key:
                 continue
 

@@ -1,13 +1,6 @@
 context: null
 
 strings:
-- crossing_minimization_description: |
-    Nodes are assigned to layers.
-    Nodes in the same layer have an ordering.
-    Each layer has a width.
-    Edges connect pairs of nodes.
-    The ordering should minimize crossings between edges.
-
 - labyrinth_description: |
     There is an initial cell and a goal cell.
     Cells are connected by adjacency relations.
@@ -28,24 +21,20 @@ strings:
     A target cell must be reached in a fixed number of moves.
 
 - sokoban_description: |
-    A player and boxes occupy grid cells.
-    Movement is directional.
-    A box is pushed only if the next cell is clear.
-    All boxes must be placed on goal cells.
+    A warehouse grid contains a player and stones occupying floor cells.
+    Movement is directional across adjacent locations.
+    A stone can be pushed only if the next cell is clear.
+    Goal stones must eventually be placed on designated storage (goal) cells.
+
     
 extract:
 - problem_name(name): 
     prompt: |
         Tell me the name of the problem that best match the text in INPUT.
-        Choose from the following options: [crossing_minimization, labyrinth, nomystery, ricochetrobots, sokoban]
+        Choose from the following options: [labyrinth, nomystery, ricochetrobots, sokoban]
         
         
         Here is a description of each problem:
-        
-        crossing_minimization:
-        {crossing_minimization_description}
-        Predicates: layers/1, width/2, in_layer/2, edge/2        
-        
         
         labyrinth:
         {labyrinth_description}
@@ -64,59 +53,311 @@ extract:
         
         sokoban:
         {sokoban_description}
-        Predicates: movedir/3, goal/1, stone/1, player/1, at/2, clear/2
-
-
-# Crossing Minimization predicates
-- width(layer, number_of_nodes): 
-    prompt: |
-        {crossing_minimization_description}
-
-        For each layer, specify the number of nodes.
-    extraction_condition: 
-        - condition: problem_name(crossing_minimization)
-          monotone: true
-
-- in_layer(layer, node): 
-    prompt: | 
-        {crossing_minimization_description}
+        Predicates: at/2, clear/2, isgoal/1, isnongoal/1, goal/1, player/1, steps/1, movedir/3
         
-        For each layer, list every node that belongs to that layer.
-    extraction_condition: 
-        - condition: problem_name(crossing_minimization)
-          monotone: true
-        - condition: width(_, _)
-          monotone: true
 
+# Labirinth predicates
+- size(value): 
+    prompt: | 
+        {labyrinth_description} 
+        
+        Identify the dimensions of the grid. 
+        The "value" is the size of the quadratic grid of fields (an integer).
+    extraction_condition:
+        - condition: problem_name(labyrinth)
+          monotone: true
     knowledge_base: |
-        warning(unmatched_layer_size, (Layer,Size,Cnt)) :-  width(Layer,Size),
-        Cnt = #count{Node : in_layer(Layer,Node)}, Size != Cnt.  
+        field(X,Y) :- size(N), X = 1..N, Y = 1..N.
+        #show field/2.
 
-        #show warning/2.
-        #show in_layer/2.
-
-- layers(value): 
-    prompt: |
-        {crossing_minimization_description}
-
-        value is the total number of layers.
-    extraction_condition: 
-        - condition: problem_name(crossing_minimization) 
-          monotone: true
-        - condition: in_layer(_, _)
-          monotone: true
-        - condition: not warning(_, _)  
-
-- edge(source, target):
+- init_on(x, y): 
     prompt: | 
-        {crossing_minimization_description}
+        {labyrinth_description} 
         
-        List all the edges from source to target.
-    extraction_condition: 
-        - condition: problem_name(crossing_minimization) 
+        Identify the initial cell where the player or object starts. 
+        Extract the position as two integer coordinates: "x" (horizontal/column) and "y" (vertical/row).
+    extraction_condition:
+        - condition: problem_name(labyrinth)
           monotone: true
-        - condition: layers(_)
-          monotone: true 
+    knowledge_base: |
+        #show init_on/2.
+
+- goal_on(x, y): 
+    prompt: | 
+        {labyrinth_description} 
+        
+        Identify the goal or target cell that must be reached. 
+        Extract the position as two integer coordinates: "x" and "y".
+    extraction_condition:
+        - condition: problem_name(labyrinth)
+          monotone: true
+    knowledge_base: |
+        #show goal_on/2.
+
+- connect(x, y, direction): 
+    prompt: | 
+        {labyrinth_description} 
+        
+        List all the connections between grid cells. 
+        For each connection, identify the starting cell coordinates "x" and "y" (integers) and the "direction" of the move.
+        
+        The "direction" must be exactly one of these lowercase characters: n, s, e, or w.
+    extraction_condition:
+        - condition: problem_name(labyrinth)
+          monotone: true
+    knowledge_base: |
+        #show connect/3.
+
+- max_steps(value): 
+    prompt: | 
+        {labyrinth_description} 
+        
+        Identify the constraint on movement. 
+        The "value" is the maximum number of steps or moves allowed to solve the labyrinth (an integer).
+    extraction_condition:
+        - condition: problem_name(labyrinth)
+          monotone: true
+    knowledge_base: |
+        #show max_steps/1.
+
+
+# Nomystery predicates
+- at(object, location): 
+    prompt: |
+        {nomystery_description} 
+        
+        Identify the starting positions of all entities (trucks, packages, etc.).
+        For each 'object', specify its initial 'location'.
+    extraction_condition:
+        - condition: problem_name(nomystery)
+          monotone: true
+    knowledge_base: |
+        #show at/2.
+
+- fuel(truck, quantity): 
+    prompt: |
+        {nomystery_description} 
+        
+        Identify the starting fuel levels for all trucks.
+        For each 'truck', specify the initial 'quantity' of fuel as an integer.
+    extraction_condition:
+        - condition: problem_name(nomystery)
+          monotone: true
+    knowledge_base: |
+        #show fuel/2.
+
+- fuelcost(cost, source, target): 
+    prompt: |
+        {nomystery_description} 
+        
+        Identify the connections between locations and how much fuel they consume.
+        For each path, extract the 'source' (starting location), the 'target' (destination), and the 'cost' (the integer amount of fuel required).
+    extraction_condition:
+        - condition: problem_name(nomystery)
+          monotone: true
+    knowledge_base: |
+        #show fuelcost/3.
+
+- goal(package, location):
+    prompt: |
+        {nomystery_description} 
+        
+        Identify the delivery requirements for all packages.
+        For each 'package', specify the final 'location' it must be delivered to.
+    extraction_condition:
+        - condition: problem_name(nomystery)
+          monotone: true
+    knowledge_base: |
+        #show goal/2.
+
+- steps(value): 
+    prompt: |
+        {nomystery_description} 
+        
+        Identify the plan length or step limit.
+        The "value" is the total number of steps or actions allowed to solve the problem (an integer).
+    extraction_condition:
+        - condition: problem_name(nomystery)
+          monotone: true
+    knowledge_base: |
+        step(1..N) :- steps(N).
+        #show step/1.
+
+
+
+
+# Ricochet Robots predicates
+- dim(value):
+    prompt: |
+        {ricochetrobots_description} 
+        
+        Identify the dimensions of the game board.
+        The "value" is the size (dimension) of one side of the square board (an integer).
+    extraction_condition:
+        - condition: problem_name(ricochetrobots)
+          monotone: true
+    knowledge_base: |
+        dim(I-1) :- dim(I), I > 1.
+        #show dim/1.
+
+
+- pos(robot, x, y):
+    prompt: |
+        {ricochetrobots_description} 
+        
+        Identify the initial starting positions for all robots on the grid.
+        For each robot, extract the 'robot' name (e.g., its color), and its 'x' and 'y' coordinates (integers).
+    extraction_condition:
+        - condition: problem_name(ricochetrobots)
+          monotone: true
+    knowledge_base: |
+        #show pos/3.
+
+- barrier(source_x, source_y, target_x, target_y, direction): 
+    prompt: |
+        {ricochetrobots_description} 
+        
+        Identify all barriers (walls) that block movement between adjacent cells. 
+        For each barrier, specify the starting cell (source_x, source_y), the adjacent cell it blocks (target_x, target_y), and the "direction" of the barrier relative to the source.
+        
+        The "direction" must be one of these lowercase strings: north, south, east, west.
+    extraction_condition:
+        - condition: problem_name(ricochetrobots)
+          monotone: true
+    knowledge_base: |
+        barrier(X,Y,X',Y',Dir) :- barrier(X',Y',X,Y,Dir).
+
+        barrier(X,Y,Dir) :- barrier(X,Y,X',Y',Dir), Dir == west,  (X',Y') == (X-1,Y).
+        barrier(X,Y,Dir) :- barrier(X,Y,X',Y',Dir), Dir == east,  (X',Y') == (X+1,Y).
+        barrier(X,Y,Dir) :- barrier(X,Y,X',Y',Dir), Dir == north, (X',Y') == (X,Y-1).
+        barrier(X,Y,Dir) :- barrier(X,Y,X',Y',Dir), Dir == south, (X',Y') == (X,Y+1).
+        
+        #show barrier/3.
+
+- target(robot, x, y):
+    prompt: |
+        {ricochetrobots_description} 
+        
+        Identify the goal objective of the puzzle.
+        Specify which 'robot' (unquoted string) must reach which 'x' and 'y' position (integers).
+    extraction_condition:
+        - condition: problem_name(ricochetrobots)
+          monotone: true
+    knowledge_base: |
+        #show target/3.
+
+- length(value): 
+    prompt: |
+        {ricochetrobots_description} 
+        
+        Identify the maximum move limit for the puzzle.
+        The "value" is the total number of moves allowed in the final plan (an integer).
+    extraction_condition:
+        - condition: problem_name(ricochetrobots)
+          monotone: true
+    knowledge_base: |
+        #show length/1.
+
+
+#sokoban predicates
+- at(object, position):          
+    prompt: |
+        {sokoban_description} 
+        
+        Identify the starting locations of the movable elements.
+        For each 'object' (either "sokoban" for the player or "stone" for a box), specify its initial 'position' cell name (e.g., pos_1_1).
+    extraction_condition:
+        - condition: problem_name(sokoban)
+          monotone: true
+    knowledge_base: |
+        #show at/2.
+        
+- clear(location):
+    prompt: |
+        {sokoban_description} 
+        
+        Identify all grid cells that are currently unoccupied.
+        For each empty cell, provide the 'location' identifier (an unquoted string).
+    extraction_condition:
+        - condition: problem_name(sokoban)
+          monotone: true
+    knowledge_base: |
+        #show clear/1.
+
+- isgoal(location): 
+    prompt: |
+        {sokoban_description} 
+        
+        Identify all target locations where stones must be placed.
+        For each goal square, provide its 'location' identifier (an unquoted string).
+    extraction_condition:
+        - condition: problem_name(sokoban)
+          monotone: true
+    knowledge_base: |
+        #show isgoal/1.
+
+- isnongoal(location): 
+    prompt: |
+        {sokoban_description} 
+        
+        Identify all floor locations that are NOT designated as goal squares.
+        For each non-goal cell, provide its 'location' identifier (an unquoted string).
+    extraction_condition:
+        - condition: problem_name(sokoban)
+          monotone: true
+    knowledge_base: |
+        #show isnongoal/1.
+
+- goal(stone): 
+    prompt: |
+        {sokoban_description} 
+        
+        Identify which specific stones or boxes are required to be moved to goal positions.
+        For each required stone, provide its identifier (an unquoted string).
+    extraction_condition:
+        - condition: problem_name(sokoban)
+          monotone: true
+    knowledge_base: |
+        #show goal/1.
+
+- player(id): 
+    prompt: |
+        {sokoban_description} 
+        
+        Identify the unique identifier for the player character (the sokoban).
+        The "id" is the name or string used to represent the person moving the stones.
+    extraction_condition:
+        - condition: problem_name(sokoban)
+          monotone: true
+    knowledge_base: |
+        #show player/1.
+
+- steps(value): 
+    prompt: |
+        {sokoban_description} 
+        
+        Identify the total number of actions allowed to solve the puzzle.
+        The "value" is the step limit or maximum move count (an integer).
+    extraction_condition:
+        - condition: problem_name(sokoban)
+          monotone: true
+    knowledge_base: |
+        step(I) :- steps(N), I = 1..N.
+        #show step/1.
+
+- movedir(source, target, direction): 
+    prompt: |
+        {sokoban_description} 
+        
+        Define the adjacency and direction between all connected grid cells.
+        For every pair of adjacent cells, specify the 'source' (starting cell), the 'target' (destination cell), and the 'direction' required to move from source to target.
+        
+        The 'direction' must be one of the following: dir_up, dir_down, dir_left, dir_right.
+    extraction_condition:
+        - condition: problem_name(sokoban)
+          monotone: true
+    knowledge_base: |
+        #show movedir/3.
 
 
 knowledge_base: null

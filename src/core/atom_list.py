@@ -9,7 +9,7 @@ class atomList:
     atoms: list[atom] = field(default_factory=list)
 
     def __str__(self):
-        return '.\n'.join(str(atom) for atom in self.atoms) + '.'
+        return '\n'.join(str(atom) for atom in self.atoms)
 
     def __add__(self, other: 'atomList') -> 'atomList':
         return self.atoms.extend(other.atoms) or self

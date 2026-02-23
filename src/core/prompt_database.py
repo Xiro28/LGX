@@ -31,9 +31,10 @@ class promptDatabase:
 
         return promptDatabase(connection=connection, cursor=cursor)
 
-    def get_cached_response(self, message: list, llm_model: str, configuration: Dict) -> Optional[Dict]:
+    def get_cached_response(self, message: list, llm_model: str, configuration: Dict) -> Optional[tuple]:
         self.cursor.execute('SELECT response, token_in, token_out, extraction_time FROM prompt_cache WHERE prompt = ? and llm_model = ? and configuration = ?', (str(message), llm_model, str(configuration)))
-        return self.cursor.fetchone()
+        query_result = self.cursor.fetchone()
+        return query_result
     
     def cache_response(self, message: list, llm_model: str, configuration: Dict, response: str, token_in: int, token_out: int, extraction_time: int):
         self.cursor.execute('INSERT INTO prompt_cache (prompt, llm_model, configuration, response, token_in, token_out, extraction_time) VALUES (?, ?, ?, ?, ?, ?, ?)', (str(message), llm_model, str(configuration), response, token_in, token_out, extraction_time ))

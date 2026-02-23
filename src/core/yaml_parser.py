@@ -18,18 +18,27 @@ class yamlParser:
         except yaml.YAMLError as exc:
             raise ValueError(f"Error parsing YAML file: {exc}") from exc
 
+
+
 @typechecked
 @dataclass(frozen=True)
-class applicationParser(yamlParser):
-
+class application_configuration:
     context: Optional[str] = field(default=None)
     strings: Optional[str] = field(default=None)
 
     predicates: list[predicate] = field(default=None) 
     kb: str = field(default=None)
 
+@typechecked
+@dataclass(frozen=True)
+class behaviour_configuration:
+    init:    str 
+    context: str
+    mapping: str
+
+class applicationParser(yamlParser):
     @classmethod
-    def from_yaml(cls, file_path: str) -> "applicationParser":
+    def from_yaml(cls, file_path: str) -> "application_configuration":
         data = cls.parse(file_path)
 
         assert "context" in data, "Missing 'context' section in YAML file."
@@ -40,22 +49,16 @@ class applicationParser(yamlParser):
         # Create predicate instances from the 'extract' section
         predicates = [predicate.create(predicate_definition=pred_def, strings=data.get("strings", [])) for pred_def in data["extract"]]
 
-        return cls(
+        return application_configuration(
             context=data.get("context"),
             strings=data.get("strings"),
             predicates=predicates,
             kb=data.get("kb"),
         )
             
-@typechecked
-@dataclass(frozen=True)
 class behaviourParser(yamlParser):
-    init:    str 
-    context: str
-    mapping: str
-
     @classmethod
-    def from_yaml(cls, file_path: str) -> "behaviourParser":
+    def from_yaml(cls, file_path: str) -> "behaviour_configuration":
         data = cls.parse(file_path)
 
         assert isinstance(data, dict), "YAML file must contain a dictionary at the top level."
@@ -66,7 +69,7 @@ class behaviourParser(yamlParser):
         assert "context" in data["preprocessing"], "Missing 'context' section in YAML file."
         assert "mapping" in data["preprocessing"], "Missing 'mapping' section in YAML file."
 
-        return cls(
+        return behaviour_configuration(
             init=data["preprocessing"].get("init"),
             context=data["preprocessing"].get("context"),
             mapping=data["preprocessing"].get("mapping"),

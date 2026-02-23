@@ -1,58 +1,64 @@
 import logging
 import re
 import json
-from time import time
 from typing import Any, Dict, List, Optional, Union, Tuple
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
+from typeguard import typechecked
+
+# Assuming these imports exist in your project structure
 from src.core.atom_list import atomList
 from src.core.knowledge_base import knowledgeBase, conditionProgram
 from src.core.json_schema import JSONSchemaBuilder
 from src.core.predicate_condition import predicate_condition
-
 from src.helpers.generate_condition_program import generate_min_program
 
-from typeguard import typechecked
 
 @typechecked
 @dataclass(frozen=True)
 class predicate:
     predicate_definition: Dict[str, Any]
-    
     defined_predicate: str
     grammar: Any
     formatted_predicate: str
     advanced_prompt_type: bool
-    
     prompt: str
     kb: knowledgeBase
-
-    conditions: List[predicate_condition] | predicate_condition | None
     condition_program: conditionProgram
+    conditions: List[predicate_condition] = field(default_factory=list)
 
     @classmethod
     def create(cls, predicate_definition: Dict[str, Any], strings: List[Dict[str, Any]]) -> "predicate":
         
-        is_group = "predicates" in predicate_definition
-        
-        if is_group:
+        # 1. Determine Predicate Type (Group vs Single)
+        if "predicates" in predicate_definition:
+            # Group Logic
             group = predicate_definition["predicates"]
             defined_predicate = " ".join(group)
             grammar = JSONSchemaBuilder().generate_single_grammar(group)
-            config_payload = predicate_definition
+            config_payload = predicate_definition # The definition itself holds the config for groups
+            is_group = True
         else:
+            # Single Logic
             defined_predicate = next(iter(predicate_definition))
             config_payload = predicate_definition[defined_predicate]
             grammar = JSONSchemaBuilder().generate(defined_predicate)
+            is_group = False
 
         formatted_predicate = json.dumps(grammar.__info__)
 
-        is_advanced = any(k in config_payload for k in ["extraction_condition", "knowledge_base"])
+        # 2. Extract Configuration
+        # Check if it's an advanced config (dict with KB/Conditions) or simple (just prompt string)
+        is_advanced = False
+        if isinstance(config_payload, dict):
+            is_advanced = bool(config_payload.get("extraction_condition") or config_payload.get("knowledge_base"))
 
         raw_prompt, kb, conditions = cls._resolve_config(config_payload, defined_predicate, is_advanced, is_group)
-        
+
+        # 3. Interpolate Prompt
         prompt = cls._interpolate_prompt(raw_prompt, strings)
 
+        # 4. Build Condition Program
         condition_program = cls._process_conditions(conditions)
 
         return cls(
@@ -68,27 +74,37 @@ class predicate:
         )
 
     @staticmethod
-    def _resolve_config(config: Union[Dict, str], name: str, is_advanced: bool, is_group: bool) -> tuple:
+    def _resolve_config(config: Union[Dict, str], name: str, is_advanced: bool, is_group: bool) -> Tuple[str, knowledgeBase, List[predicate_condition]]:
+        # Case 1: Simple String Config
         if isinstance(config, str):
             return config, knowledgeBase(""), []
 
+        # Case 2: Advanced Config (KB or Conditions present)
         if is_advanced:
             prompt = config.get("prompt", "")
-            kb = config.get("knowledge_base", None)
-            cond = config.get("extraction_condition")
+            kb_source = config.get("knowledge_base", "")
             
-            conditions = [] 
-            if cond and isinstance(cond, list):
-                conditions = [
-                    predicate_condition(c["condition"], c.get("monotone", False)) 
-                    for c in cond if isinstance(c, dict) and "condition" in c
-                ]
-            return prompt, knowledgeBase(kb), conditions
+            raw_conds = config.get("extraction_condition")
+            conditions = []
+            
+            if raw_conds:
+                # Handle single condition (dict) vs list of conditions
+                if isinstance(raw_conds, dict) and "condition" in raw_conds:
+                    conditions.append(predicate_condition(raw_conds["condition"], raw_conds.get("monotone", False)))
+                elif isinstance(raw_conds, list):
+                    conditions = [
+                        predicate_condition(c["condition"], c.get("monotone", False)) 
+                        for c in raw_conds if isinstance(c, dict) and "condition" in c
+                    ]
+            
+            return prompt, knowledgeBase(kb_source), conditions
         
+        # Case 3: Simple Dict Config (Prompt only, nested or direct)
         if is_group:
             prompt = config.get("prompt", "")
         else:
-            prompt = config.get("prompt") if "prompt" in config else config.get(name, "")
+            # Handle {"predicate": {"prompt": "..."}} vs {"predicate": "prompt"}
+            prompt = config.get("prompt", "") if "prompt" in config else config.get(name, "")
         
         return prompt, knowledgeBase(""), []
 
@@ -96,8 +112,13 @@ class predicate:
     def _interpolate_prompt(template: str, strings: List[Dict]) -> str:
         if not template:
             return ""
+        
+        # Flatten list of dicts into single dict
         replacements = {k: v for d in strings for k, v in d.items()}
+        
+        # Find all tokens {token}
         tokens = re.findall(r"\{([A-Za-z0-9\_]+)\}", template)
+        
         result = template
         for token in tokens:
             if token in replacements:
@@ -105,74 +126,72 @@ class predicate:
         return result
 
     @classmethod
-    def _process_conditions(cls, cond_info: list[predicate_condition] | None) -> conditionProgram:
-        # Determine if we have a complex condition (a program) or a simple one (just a condition string)
-
+    def _process_conditions(cls, cond_info: List[predicate_condition]) -> conditionProgram:
         if not cond_info:
             return conditionProgram("")
         
-        complete_condition_program = conditionProgram("")
-        
-        for cond in cond_info:
+        combined_program_lines = []
 
-            min_program: str = generate_min_program(cond.condition)
-
-            current_condition = conditionProgram(min_program)
+        for idx, cond in enumerate(cond_info):
             try:
-                current_condition.validate() # If this fails, it will raise an exception and we won't add it to the program
-                complete_condition_program = complete_condition_program + current_condition
-                return complete_condition_program
-            except Exception as e:
-                pass
+                # Try to generate a minimized program (e.g., "uuid_0 :- condition.")
+                # Note: generate_min_program likely needs to handle the index to create unique heads
+                # or we assume the condition is complex and validate it as is.
+                min_program = generate_min_program(cond.condition)
+                combined_program_lines.append(min_program)
+            except Exception:
+                # Fallback: treat as raw complex condition
+                combined_program_lines.append(cond.condition)
 
-            try:
-                # If validation fails, we treat it as a program string directly (complex condition)
-                current_condition = conditionProgram(cond.condition)
-                current_condition.validate() # If this fails, it will raise an exception and we won't add it to the program
-                complete_condition_program = complete_condition_program + current_condition
-                return complete_condition_program
-            except Exception as e:
-                logging.error(f"Invalid condition definition: {cond.condition}: {e}", exc_info=True)
-            
-            return conditionProgram("")        
+        full_program_str = "\n".join(combined_program_lines)
+
+        try:
+            prog = conditionProgram(full_program_str)
+            prog.validate()
+            return prog
+        except Exception as e:
+            logging.error(f"Failed to validate combined condition program: {e}")
+            return conditionProgram("")
 
 
-    def evaluate_program(self, result: atomList) -> bool:
+    def evaluate_program(self, result: atomList) -> tuple[bool, list]:
         has_model = True
+        condition_results = list()
 
         if isinstance(self.conditions, list):
             for idx, cond in enumerate(self.conditions):
-                check = result.contain_atom_with_suffix(f"_{idx}")
+                check = result.contain_atom_with_suffix(f"_{idx}.")
                 has_model = has_model and check
-                # Update the cache for each condition
+                condition_results.append((cond, check))
         else:
             has_model = result.not_empty()
-            # Update the cache for each condition
+            condition_results.append((self.conditions, has_model))
 
-        return has_model
-
-    def execute_condition(self) -> bool:
-        if not self.condition_program:
-            return False
+        return has_model, condition_results
+    
+    def execute_condition(self, atoms_database: atomList) -> Tuple[bool, List]:
+        if not self.condition_program or not self.conditions:
+            return (False, [])
 
         try:
-            result = self.condition_program.execute()
-
-            return self.evaluate_program(result)
-        except Exception:
-            logging.error(f"Error executing condition program for predicate {self.defined_predicate}", exc_info=True)
-            return False
-
-    def has_to_be_extracted(self) -> bool:
-        return self.execute_condition()
+            logging.debug(f"Executing condition for {self.defined_predicate}")
+            
+            result_atoms = self.condition_program.execute(atoms_database)
+            evaluated, results = self.evaluate_program(result_atoms)
+            
+            return evaluated, results
+        except Exception as e:
+            logging.error(f"Error executing condition for {self.defined_predicate}: {e}", exc_info=True)
+        
+        return (False, [])
         
     def execute_knowledge(self, atoms_database: atomList, extracted_atoms: atomList) -> atomList:
         if self.advanced_prompt_type and self.kb:
             try:
-                full_program = f"{str(atoms_database)}\n{str(extracted_atoms)}"
-                return self.kb.execute(full_program)
-            except Exception:
-                pass
+                # Combine DB atoms with newly extracted atoms for the KB check
+                return self.kb.execute(atoms_database + extracted_atoms)
+            except Exception as e:
+                logging.error(f"Error executing KB for {self.defined_predicate}: {e}")
         return extracted_atoms
     
     def get_grammar(self) -> type:
@@ -182,7 +201,7 @@ class predicate:
         return str(response).splitlines()
     
     def has_condition(self) -> bool:
-        return self.conditions != None and len(self.conditions) > 0
+        return len(self.conditions) > 0
 
     @property
     def prompt_description(self) -> str:

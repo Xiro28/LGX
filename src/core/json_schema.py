@@ -51,7 +51,7 @@ class JSONSchemaBuilder:
                 "__annotations__": {f"list_{class_name}": List[Optional[new_class]]},
                 "__class_params__": terms,
                 "__str__": list_str_method,
-                "__info__": {f"list_{class_name}": [example_obj] if terms else []}
+                "__info__": {f"list_{class_name}" : [example_obj]}
             },
         )
 
@@ -73,21 +73,28 @@ class JSONSchemaBuilder:
         class_dict['__annotations__'] = annotations
         
         def str_method(self):
-            asp_facts = []
+            asp_facts = ""
+            # Iteriamo direttamente sui campi dell'istanza (Pydantic V2 style iteration)
             for _, wrapper_obj in self:
-                if wrapper_obj is not None:
-                    fact_str = str(wrapper_obj)
-                    if fact_str:
-                        asp_facts.append(fact_str)
-            return "\n".join(asp_facts)
+                if wrapper_obj is None:
+                    continue
+                
+                # Cerchiamo la lista dentro il wrapper
+                for _, atom_list in wrapper_obj:
+                    if isinstance(atom_list, list):
+                        for atom in atom_list:
+                            if atom is not None:
+                                asp_facts += str(atom) + "\n"
+            return asp_facts.strip()
         
         class_dict['__str__'] = str_method
 
-        schema_map = {}
+        class_info = ""
         for list_cls in self.__classes:
-            schema_map.update(list_cls.__info__)
-        
-        class_info = json.dumps(schema_map, indent=2)
+            list_field_name = list(list_cls.__annotations__.keys())[0]
+            atom_cls = list_cls.__annotations__[list_field_name].__args__[0].__args__[0]
+            class_info += str(atom_cls.__info__) + " "
+
 
         class_dict['__info__'] = class_info
             

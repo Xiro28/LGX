@@ -1,0 +1,12 @@
+[
+  {
+    "problem_name": "layered_graph",
+  "text": "The graph has three layers (with id 0,1, and 2), each layer containing three nodes. Layer zero contains nodes n1, n2, and n3, while layer 2 contains nodes n7, and n9. There is an edge between n1 and n9, and node n4 is connected to n2 and n8.",
+    "output": "layer_size(0,3).\nlayer_size(1,3).\nlayer_size(2,3).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(0,n3).\nin_layer(2,n7).\nin_layer(2,n9).\nwarning(unmatched_layer_size, (1,3,0)).\nwarning(unmatched_layer_size, (2,3,2))."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "Layer zero contains nodes n1, n2, and n3, while layer 2 contains nodes n7, n8, and n9, the last two nodes are connected. Every layer has three nodes. There is an edge between n1 and n9, and node n4 is connected to n2 and n8. Finally, layer 1 contains nodes n4, n5, and n6.",
+    "output": "layer_size(0,3).\nlayer_size(1,3).\nlayer_size(2,3).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(0,n3).\nin_layer(1,n4).\nin_layer(1,n5).\nin_layer(1,n6).\nin_layer(2,n7).\nin_layer(2,n8).\nin_layer(2,n9).\nedge(n1,n9).\nedge(n4,n2).\nedge(n4,n8).\nedge(n8,n9).\nedge(n9,n1).\nedge(n2,n4).\nedge(n8,n4).\nedge(n9,n8)."
+  }
+]

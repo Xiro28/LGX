@@ -14,6 +14,8 @@ class knowledgeBase:
 
     def execute(self, atoms: Optional[atomList] = None) -> atomList:
         atoms_input = str(atoms) if atoms is not None else ""
+
+        print(f"Input: {atoms_input} Program: {self.program}")
         
         kb_output: str = Model.of_program(
             self.program, 
@@ -21,21 +23,22 @@ class knowledgeBase:
             sort=False
         ).as_facts
 
-        parsed_atoms = (
-            atom(atom_str=line.rstrip(" .")) 
+        print("KB output:", kb_output)
+
+        parsed_atoms = [
+            atom(line) 
             for line in kb_output.splitlines() 
             if line.strip()
-        )
+        ]
         
-        return atomList(atoms=list(parsed_atoms))
+        return atomList(atoms=parsed_atoms)
 
     def validate(self) -> bool:
         try:
             self.execute()
             return True
-        except Exception as e:
+        except Exception:
             return False
-
 
     def __add__(self, other: 'knowledgeBase') -> 'knowledgeBase':
         combined_program = self.program + "\n" + other.program
