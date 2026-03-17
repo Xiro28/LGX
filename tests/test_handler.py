@@ -15,8 +15,6 @@ from src.core.predicate import predicate
 from src.core.knowledge_base import knowledgeBase, conditionProgram
 
 
-# ── Factory method ────────────────────────────────────────────────────────────
-
 class TestLlmHandlerFactory:
 
     @patch("ollama.Client")
@@ -81,8 +79,6 @@ class TestLlmHandlerFactory:
         assert handler.predicate_condition_cache.cache_mode == "monotone"
 
 
-# ── craft_message_history ─────────────────────────────────────────────────────
-
 class TestCraftMessageHistory:
 
     @patch("ollama.Client")
@@ -97,8 +93,6 @@ class TestCraftMessageHistory:
         assert history[1]["role"] == "user"
         assert history[1]["content"] == "hello"
 
-
-# ── invoke_llm_constrained ────────────────────────────────────────────────────
 
 class TestInvokeLlmConstrained:
 
@@ -140,9 +134,6 @@ class TestInvokeLlmConstrained:
 
         handler.invoke_llm_constrained("p", class_response, "")
         mock_ollama_client.chat.assert_not_called()
-
-
-# ── run() ─────────────────────────────────────────────────────────────────────
 
 class TestRunPipeline:
 

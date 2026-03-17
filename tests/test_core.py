@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import MagicMock, patch
 from src.core.atom import atom
 from src.core.atom_list import atomList
-from src.core.knowledge_base import knowledgeBase
+from core.knowledge_base import knowledgeBase
 
 def test_atom_creation():
     a = atom(atom_str="test_predicate(1)")

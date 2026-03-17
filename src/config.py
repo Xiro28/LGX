@@ -22,7 +22,7 @@ except ImportError:
 # ── Ollama / LLM ─────────────────────────────────────────────────────────────
 OLLAMA_URL: str        = os.getenv("LGX_OLLAMA_URL",       "http://localhost:11434")
 OLLAMA_API_KEY: str    = os.getenv("LGX_OLLAMA_API_KEY",   "")
-LLM_MODEL: str         = os.getenv("LGX_LLM_MODEL",        "")
+LLM_MODEL: str         = os.getenv("LGX_LLM_MODEL",        "llama3.1:8b")
 LLM_TEMPERATURE: int   = int(os.getenv("LGX_LLM_TEMPERATURE", "0"))
 LLM_MAX_RETRIES: int   = int(os.getenv("LGX_LLM_MAX_RETRIES", "3"))
 

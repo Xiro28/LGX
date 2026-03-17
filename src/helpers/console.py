@@ -12,7 +12,7 @@ Usage anywhere in the project:
     console.rule("[bold cyan]LGX[/]")
 """
 
-from __future__ import annotations
+from __future__ import annotations # Used for forward references in type hints
 
 import logging
 
@@ -23,7 +23,6 @@ from rich.traceback import install as install_rich_traceback
 
 from src.config import LOG_LEVEL, LOG_RICH_TRACEBACK, CONSOLE_THEME
 
-# ── Theme ─────────────────────────────────────────────────────────────────────
 _DARK_THEME = Theme(
     {
         "info":       "bold cyan",
@@ -57,12 +56,10 @@ console: Console = Console(
     highlight=True,
 )
 
-# ── Rich tracebacks ───────────────────────────────────────────────────────────
 if LOG_RICH_TRACEBACK:
     install_rich_traceback(show_locals=False, console=console)
 
 
-# ── Logging integration ───────────────────────────────────────────────────────
 def _configure_root_logger() -> None:
     logging.basicConfig(
         level=getattr(logging, LOG_LEVEL, logging.INFO),

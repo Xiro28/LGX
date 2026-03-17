@@ -1,6 +1,3 @@
-"""
-src/core/predicate.py
-"""
 from __future__ import annotations
 
 import json
@@ -12,7 +9,7 @@ from typeguard import typechecked
 
 from src.core.atom_list import atomList
 from src.core.json_schema import JSONSchemaBuilder
-from src.core.knowledge_base import conditionProgram, knowledgeBase
+from core.knowledge_base import conditionProgram, knowledgeBase
 from src.core.predicate_condition import predicate_condition
 from src.helpers.console import get_logger
 from src.helpers.generate_condition_program import generate_min_program
@@ -86,7 +83,6 @@ class predicate:
             conditions=conditions,
         )
 
-    # ── Static helpers ────────────────────────────────────────────────────────
     @staticmethod
     def _resolve_config(
         config: Union[Dict, str],
@@ -155,7 +151,6 @@ class predicate:
             log.error(f"[error]Condition program validation failed:[/] {exc}")
             return conditionProgram("")
 
-    # ── Execution ─────────────────────────────────────────────────────────────
     def evaluate_program(self, result: atomList) -> Tuple[bool, list]:
         has_model        = True
         condition_results: list = []
@@ -197,7 +192,6 @@ class predicate:
                 )
         return extracted_atoms
 
-    # ── Properties / helpers ──────────────────────────────────────────────────
     def get_grammar(self) -> type:
         return self.grammar
 

@@ -1,6 +1,3 @@
-"""
-src/core/prompt_database.py
-"""
 from __future__ import annotations
 
 import sqlite3
@@ -33,7 +30,7 @@ class promptDatabase:
     connection: sqlite3.Connection
     cursor: sqlite3.Cursor
 
-    # ── Factory ───────────────────────────────────────────────────────────────
+
     @staticmethod
     def initialize(db_path: str) -> "promptDatabase":
         connection = sqlite3.connect(db_path)
@@ -43,7 +40,7 @@ class promptDatabase:
         log.info(f"[info]Prompt DB[/] opened → [bold]{db_path}[/]")
         return promptDatabase(connection=connection, cursor=cursor)
 
-    # ── CRUD ──────────────────────────────────────────────────────────────────
+
     def get_cached_response(
         self, message: list, llm_model: str, configuration: Dict
     ) -> Optional[tuple]:
@@ -61,6 +58,7 @@ class promptDatabase:
             )
         else:
             log.debug(f"[cache.miss]DB MISS[/] model={llm_model}")
+
         return result
 
     def cache_response(

@@ -1,8 +1,3 @@
-"""
-tests/test_filter_atoms.py
-─────────────────────────────────────────────────────────────────────────────
-Unit tests for src/helpers/filter_atoms.py.
-"""
 from __future__ import annotations
 
 import pytest
@@ -14,16 +9,14 @@ from src.helpers.filter_atoms import (
 )
 
 
-# ── _strip_leading_zeros_in_int_tokens ────────────────────────────────────────
-
 class TestStripLeadingZeros:
 
     @pytest.mark.parametrize("raw, expected", [
         ("042",         "42"),
         ("007",         "7"),
         ("0001",        "1"),
-        ("100",         "100"),      # no leading zero → unchanged
-        ("0",           "0"),        # single zero → unchanged (regex: 0+(\d+) requires ≥1 digit after)
+        ("100",         "100"),      
+        ("0",           "0"),       
         ("node(042).",  "node(42)."),
         ("",            ""),
     ])
@@ -31,21 +24,17 @@ class TestStripLeadingZeros:
         assert _strip_leading_zeros_in_int_tokens(raw) == expected
 
 
-# ── prefix_fix ────────────────────────────────────────────────────────────────
-
 class TestPrefixFix:
 
     @pytest.mark.parametrize("raw, contains", [
         ("1abc",       "malformed_term_failure__1abc"),
         ("3node(x).",  "malformed_term_failure__3node"),
-        ("edge(a,b).", "edge(a,b)."),   # valid → unchanged
-        ("node123",    "node123"),       # starts with letter → unchanged
+        ("edge(a,b).", "edge(a,b)."),   
+        ("node123",    "node123"),      
     ])
     def test_various_tokens(self, raw, contains):
         assert contains in prefix_fix(raw)
 
-
-# ── filter_asp_atoms ──────────────────────────────────────────────────────────
 
 class TestFilterAspAtoms:
 
@@ -86,8 +75,6 @@ class TestFilterAspAtoms:
     def test_ignores_non_atom_text(self):
         raw = "This is plain English, not ASP."
         result = filter_asp_atoms(raw)
-        # "not" matches "\w+\." → filtered as a propositional atom
-        # The key check is that no false positive structured atoms appear
         assert isinstance(result.not_empty(), bool)
 
     def test_returns_atomlist_type(self):
@@ -115,5 +102,4 @@ class TestFilterAspAtoms:
         functors = {a.functor() for a in result}
         assert "valid"      in functors
         assert "also_valid" in functors
-        # 3bad gets renamed to malformed_term_failure__3bad
         assert any("malformed" in a.atom_str for a in result)

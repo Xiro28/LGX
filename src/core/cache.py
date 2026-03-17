@@ -1,12 +1,3 @@
-"""
-src/core/cache.py
-─────────────────────────────────────────────────────────────────────────────
-In-memory condition-evaluation cache.
-
-Bug fixed (original line 53):
-    WRONG:  cache[condition.condition] = value   ← `condition` is the list param
-    RIGHT:  cache[cond.condition] = value         ← `cond` is the loop variable
-"""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -44,8 +35,6 @@ class ConditionCache:
         },
     )
 
-    # ── Internal helpers ──────────────────────────────────────────────────────
-
     def _use_monotone_cache(self) -> bool:
         return self.cache_mode in ("all", "monotone")
 
@@ -58,8 +47,6 @@ class ConditionCache:
         if not condition.monotone and self._use_non_monotone_cache():
             return self.non_monotone_cache
         return None
-
-    # ── Public API ────────────────────────────────────────────────────────────
 
     def update(
         self,
@@ -94,7 +81,7 @@ class ConditionCache:
         self,
         conditions: Union[predicate_condition, List[predicate_condition], None],
     ) -> bool:
-        """Return True (and bump hit stats) when *all* conditions are cached."""
+        # Return True (and bump hit stats) when *all* conditions are cached.
         if not self.enabled or conditions is None:
             return False
 
@@ -121,6 +108,7 @@ class ConditionCache:
                 else:
                     self.stats["miss_non_monotone"] += 1
                 return False
+
 
         self.stats["solver_skip"] += 1
         return True
@@ -150,8 +138,6 @@ class ConditionCache:
             result = result and cache.get(key, False)
 
         return result
-
-    # ── Invalidation ──────────────────────────────────────────────────────────
 
     def invalidate(self, monotone: bool = False) -> None:
         if monotone and self._use_monotone_cache():

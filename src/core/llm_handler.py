@@ -1,6 +1,3 @@
-"""
-src/core/llm_handler.py
-"""
 from __future__ import annotations
 
 import os
@@ -18,10 +15,7 @@ from src.config import (
     DB_FILENAME,
     ENABLE_CONDITION_CACHE,
     CONDITION_CACHE_MODE,
-    LLM_TEMPERATURE,
-    TQDM_DISABLE,
-    TQDM_NCOLS,
-    TQDM_COLOUR,
+    LLM_TEMPERATURE
 )
 from src.core.atom_list import atomList
 from src.core.cache import ConditionCache
@@ -46,7 +40,6 @@ class llmHandler:
 
     atom_database: atomList = field(init=False, default_factory=lambda: atomList(atoms=[]))
 
-    # ── Factory ───────────────────────────────────────────────────────────────
     @classmethod
     def create(
         cls,
@@ -56,7 +49,7 @@ class llmHandler:
     ) -> "llmHandler":
         console.rule("[bold cyan]LGX — initialising handler[/]")
 
-        # Prompt cache
+
         db: Optional[promptDatabase] = None
         if ENABLE_PROMPT_CACHE:
             db_path = os.getenv("LGX_DB_FILENAME", DB_FILENAME)
@@ -65,7 +58,7 @@ class llmHandler:
         else:
             log.info("[warning]Prompt cache disabled[/]")
 
-        # Condition cache
+
         cache_mode = os.getenv("LGX_CONDITION_CACHE_MODE", CONDITION_CACHE_MODE)
         use_condition_cache = (
             os.getenv("LGX_ENABLE_CONDITION_CACHE", str(ENABLE_CONDITION_CACHE)).lower() == "true"
@@ -76,7 +69,6 @@ class llmHandler:
             f" mode=[bold]{cache_mode}[/]"
         )
 
-        # Ollama client
         headers: dict[str, str] = {}
         api_key = os.getenv("LGX_OLLAMA_API_KEY", OLLAMA_API_KEY)
         if api_key:
@@ -95,7 +87,6 @@ class llmHandler:
             _llm_chat_fn=client.chat,
         )
 
-    # ── Lifecycle ─────────────────────────────────────────────────────────────
     def __del__(self) -> None:
         if self.prompt_database is not None:
             self.prompt_database.close()
@@ -105,7 +96,6 @@ class llmHandler:
         self.predicate_condition_cache.clear()
         log.debug("[info]Handler cleaned up[/]")
 
-    # ── Helpers ───────────────────────────────────────────────────────────────
     def craft_message_history(self, prompt: str, context: str) -> list:
         return [
             {"role": "system", "content": f"{self.behaviour_config.init}{context}"},
@@ -119,7 +109,6 @@ class llmHandler:
         grammar  = class_response.model_json_schema(mode="serialization")
         history  = self.craft_message_history(prompt, context)
 
-        # Cache lookup
         if self.prompt_database is not None:
             cached = self.prompt_database.get_cached_response(history, self.llm_model, configuration)
             if cached:
@@ -128,10 +117,7 @@ class llmHandler:
                     return class_response.model_validate_json(cached[0])
                 except Exception as exc:
                     log.warning(f"[warning]Cache parse error:[/] {exc}")
-            else:
-                input("HI")
 
-        # LLM call
         try:
             log.debug(f"[llm]LLM call[/] model=[bold]{self.llm_model}[/]")
             resp = self._llm_chat_fn(
@@ -159,7 +145,6 @@ class llmHandler:
             log.error(f"[error]LLM error:[/] {exc}", exc_info=True)
             return None
 
-    # ── Core pipeline ─────────────────────────────────────────────────────────
     def _structured_output_call(
         self, prompt: str
     ) -> Generator[tuple[Any, predicate], None, None]:
@@ -172,48 +157,37 @@ class llmHandler:
             )
 
         predicates = self.application_config.predicates or []
+    
+        for pred in predicates:
+            if pred.has_condition():
+                if self.predicate_condition_cache.skip_logic_solver(pred.conditions):
+                    log.debug(
+                        f"[cache.hit]Condition cache HIT[/] → skipping solver for"
+                        f" [predicate]{pred}[/]"
+                    )
+                    call_oracle, condition_results = True, []
+                else:
+                    call_oracle, condition_results = pred.execute_condition(
+                        self.atom_database
+                    )
+                    for cond, val in condition_results:
+                        self.predicate_condition_cache.update(cond, val)
 
-        with tqdm(
-            predicates,
-            desc="Predicates",
-            unit="pred",
-            disable=TQDM_DISABLE,
-            ncols=TQDM_NCOLS,
-            colour=TQDM_COLOUR,
-            leave=False,
-        ) as pbar:
-            for pred in pbar:
-                pbar.set_postfix_str(str(pred))
+                if not call_oracle:
+                    log.debug(f"[warning]Condition FALSE[/] — skipping [predicate]{pred}[/]")
+                    continue
+                if not self.predicate_condition_cache.get(pred.conditions):
+                    continue
 
-                if pred.has_condition():
-                    if self.predicate_condition_cache.skip_logic_solver(pred.conditions):
-                        log.debug(
-                            f"[cache.hit]Condition cache HIT[/] → skipping solver for"
-                            f" [predicate]{pred}[/]"
-                        )
-                        call_oracle, condition_results = True, []
-                    else:
-                        call_oracle, condition_results = pred.execute_condition(
-                            self.atom_database
-                        )
-                        for cond, val in condition_results:
-                            self.predicate_condition_cache.update(cond, val)
+            appl_mapping = behaviour_mapping.replace(
+                "{instructions}", pred.prompt_description
+            )
+            appl_mapping = appl_mapping.replace("{atom}", pred.predicate_formatted)
 
-                    if not call_oracle:
-                        log.debug(f"[warning]Condition FALSE[/] — skipping [predicate]{pred}[/]")
-                        continue
-                    if not self.predicate_condition_cache.get(pred.conditions):
-                        continue
-
-                appl_mapping = behaviour_mapping.replace(
-                    "{instructions}", pred.prompt_description
-                )
-                appl_mapping = appl_mapping.replace("{atom}", pred.predicate_formatted)
-
-                log.info(f"[predicate]▸ Extracting[/] [bold]{pred}[/]")
-                yield self.invoke_llm_constrained(
-                    appl_mapping, pred.get_grammar(), behaviour_context
-                ), pred
+            log.info(f"[predicate]▸ Extracting[/] [bold]{pred}[/]")
+            yield self.invoke_llm_constrained(
+                appl_mapping, pred.get_grammar(), behaviour_context
+            ), pred
 
     def run(self, prompt: str) -> atomList:
         console.rule("[bold cyan]LGX — inference run[/]")

@@ -1,11 +1,3 @@
-"""
-tests/test_config.py
-─────────────────────────────────────────────────────────────────────────────
-Tests that src/config.py correctly reads and coerces environment variables.
-
-Each test uses monkeypatch + importlib.reload so the module-level constants
-are re-evaluated with the patched environment.
-"""
 from __future__ import annotations
 
 import importlib
@@ -14,7 +6,6 @@ import pytest
 
 
 def _reload_config(monkeypatch, env: dict[str, str]):
-    """Patch os.environ with *env* and reload src.config; return the fresh module."""
     for k, v in env.items():
         monkeypatch.setenv(k, v)
     import src.config as cfg

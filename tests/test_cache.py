@@ -1,15 +1,9 @@
-"""
-tests/test_cache.py
-"""
 from __future__ import annotations
 
 import pytest
 
 from src.core.cache import ConditionCache
 from src.core.predicate_condition import predicate_condition
-
-
-# ── Fixtures ──────────────────────────────────────────────────────────────────
 
 @pytest.fixture
 def cond_mono() -> predicate_condition:
@@ -19,9 +13,6 @@ def cond_mono() -> predicate_condition:
 @pytest.fixture
 def cond_non_mono() -> predicate_condition:
     return predicate_condition("not error(_)", False)
-
-
-# ── Construction ──────────────────────────────────────────────────────────────
 
 class TestConditionCacheConstruction:
 

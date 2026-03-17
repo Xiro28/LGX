@@ -1,47 +1,58 @@
-from dataclasses                 import dataclass, field
-from typeguard                   import typechecked
-from typing                      import Optional
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Optional
 
 from dumbo_asp.primitives.models import Model
+from typeguard import typechecked
 
 from src.core.atom import atom
 from src.core.atom_list import atomList
+from src.helpers.console import get_logger
+
+log = get_logger(__name__)
+
 
 @typechecked
 @dataclass(frozen=True)
 class knowledgeBase:
     program: str
 
-    def execute(self, atoms: Optional[atomList] = None) -> atomList:
-        atoms_input = str(atoms) if atoms is not None else ""
-        
+    def execute(
+        self,
+        database_atoms: Optional[atomList] = None,
+        extracted_atoms: Optional[atomList] = None,
+    ) -> atomList:
+        atoms_input = str(database_atoms) if database_atoms is not None else ""
+        if extracted_atoms is not None:
+            atoms_input += "\n" + str(extracted_atoms)
+
+        log.debug(f"[info]KB execute[/] input_atoms={len(atoms_input.splitlines())} lines")
+
         kb_output: str = Model.of_program(
-            self.program, 
-            atoms_input, 
-            sort=False
+            self.program, atoms_input, sort=False
         ).as_facts
 
-        parsed_atoms = (
-            atom(atom_str=line.rstrip(" .")) 
-            for line in kb_output.splitlines() 
+        parsed = [
+            atom(line)
+            for line in kb_output.splitlines()
             if line.strip()
-        )
-        
-        return atomList(atoms=list(parsed_atoms))
+        ]
+        log.debug(f"[info]KB produced[/] [bold]{len(parsed)}[/] atom(s)")
+        return atomList(atoms=parsed)
 
     def validate(self) -> bool:
         try:
             self.execute()
             return True
-        except Exception as e:
+        except Exception as exc:
+            log.debug(f"[warning]KB validation failed:[/] {exc}")
             return False
 
+    def __add__(self, other: "knowledgeBase") -> "knowledgeBase":
+        return type(self)(self.program + "\n" + other.program)
 
-    def __add__(self, other: 'knowledgeBase') -> 'knowledgeBase':
-        combined_program = self.program + "\n" + other.program
-        return type(self)(combined_program)
-
-    def __str__(self):
+    def __str__(self) -> str:
         return self.program
 
 

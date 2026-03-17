@@ -11,7 +11,7 @@ from typeguard import typechecked
 
 from src.config import APPLICATION_YAML, BEHAVIOUR_YAML, LLM_MODEL
 from src.core.atom_list import atomList
-from src.core.knowledge_base import knowledgeBase
+from core.knowledge_base import knowledgeBase
 from src.core.llm_handler import llmHandler
 from src.core.yaml_parser import applicationParser, behaviourParser
 from src.helpers.console import console, get_logger
@@ -24,7 +24,6 @@ log = get_logger(__name__)
 class lgx:
     llm_instance: llmHandler
 
-    # ── Factory ───────────────────────────────────────────────────────────────
     @classmethod
     def create(
         cls,

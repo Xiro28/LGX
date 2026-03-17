@@ -1,6 +1,3 @@
-"""
-src/core/yaml_parser.py
-"""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -14,7 +11,6 @@ from src.helpers.console import get_logger
 
 log = get_logger(__name__)
 
-# ── Required YAML keys ────────────────────────────────────────────────────────
 _APP_REQUIRED  = ("context", "strings", "extract", "knowledge_base")
 _BEH_REQUIRED  = ("init", "context", "mapping")
 
@@ -33,7 +29,6 @@ class yamlParser:
             raise ValueError(f"YAML parse error in {file_path}: {exc}") from exc
 
 
-# ── Data containers ───────────────────────────────────────────────────────────
 
 @typechecked
 @dataclass(frozen=True)
@@ -52,7 +47,6 @@ class behaviour_configuration:
     mapping: str
 
 
-# ── Parsers ───────────────────────────────────────────────────────────────────
 
 class applicationParser(yamlParser):
     @classmethod

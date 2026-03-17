@@ -1,8 +1,3 @@
-"""
-tests/test_atoms.py
-─────────────────────────────────────────────────────────────────────────────
-Unit tests for atom, atomList, and predicate_condition.
-"""
 from __future__ import annotations
 
 import pytest
@@ -10,11 +5,6 @@ import pytest
 from src.core.atom import atom
 from src.core.atom_list import atomList
 from src.core.predicate_condition import predicate_condition
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# atom
-# ═══════════════════════════════════════════════════════════════════════════════
 
 class TestAtom:
 
@@ -55,10 +45,6 @@ class TestAtom:
         with pytest.raises((AttributeError, TypeError)):
             a.atom_str = "q."  # type: ignore[misc]
 
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# atomList
-# ═══════════════════════════════════════════════════════════════════════════════
 
 class TestAtomList:
 
@@ -131,10 +117,6 @@ class TestAtomList:
     def test_empty_atomlist_to_facts(self, empty_atom_list):
         assert empty_atom_list.to_facts() == ""
 
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# predicate_condition
-# ═══════════════════════════════════════════════════════════════════════════════
 
 class TestPredicateCondition:
 
