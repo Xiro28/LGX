@@ -44,9 +44,8 @@ class ConditionCache:
     def _select_cache(self, condition: predicate_condition) -> Dict[str, bool] | None:
         if condition.monotone and self._use_monotone_cache():
             return self.monotone_cache
-        if not condition.monotone and self._use_non_monotone_cache():
-            return self.non_monotone_cache
-        return None
+        
+        return self.non_monotone_cache
 
     def update(
         self,
@@ -136,6 +135,11 @@ class ConditionCache:
             if cache is None:
                 return False
             result = result and cache.get(key, False)
+
+        log.debug(
+            f"[cache.get]Cache GET[/] conditions={[c.condition for c in conditions]}"
+            f" result={result}"
+        )
 
         return result
 

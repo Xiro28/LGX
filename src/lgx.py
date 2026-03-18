@@ -23,6 +23,7 @@ log = get_logger(__name__)
 @dataclass(frozen=True)
 class lgx:
     llm_instance: llmHandler
+    kb: knowledgeBase
 
     @classmethod
     def create(
@@ -57,7 +58,12 @@ class lgx:
         beh_cfg = behaviourParser.from_yaml(behaviour_filename)
 
         llm_inst = llmHandler.create(llm_model, app_cfg, beh_cfg)
-        return cls(llm_instance=llm_inst)
+        kb_inst = knowledgeBase(app_cfg.kb) if app_cfg.kb else None
+
+        if kb_inst == None or kb_inst.validate():
+            return cls(llm_instance=llm_inst, kb=kb_inst)
+        else:
+            raise ValueError("Invalid knowledge base program")
 
     # ── Public API ────────────────────────────────────────────────────────────
     def infer(self, prompt: str) -> "lgx":
@@ -65,9 +71,12 @@ class lgx:
         self.llm_instance.run(prompt)
         return self
 
-    def execute_knowledge_base(self, kb: knowledgeBase) -> atomList:
+    def execute_knowledge_base(self) -> atomList:
         """Execute an external KB against the currently extracted atoms."""
-        return kb.execute(self.llm_instance.get_extracted_atoms())
+        if self.kb is None:
+            return atomList(atoms=[])
+        
+        return self.kb.execute(self.llm_instance.get_extracted_atoms())
 
     def get_extracted_atoms(self) -> atomList:
         return self.llm_instance.get_extracted_atoms()

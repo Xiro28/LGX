@@ -38,6 +38,7 @@ class knowledgeBase:
             for line in kb_output.splitlines()
             if line.strip()
         ]
+
         log.debug(f"[info]KB produced[/] [bold]{len(parsed)}[/] atom(s)")
         return atomList(atoms=parsed)
 

@@ -5,7 +5,6 @@ from dataclasses import dataclass, field
 from typing import Any, Generator, Optional
 
 import ollama
-from tqdm import tqdm
 from typeguard import typechecked
 
 from src.config import (
@@ -39,6 +38,7 @@ class llmHandler:
     _llm_chat_fn: Any
 
     atom_database: atomList = field(init=False, default_factory=lambda: atomList(atoms=[]))
+    statistics: dict = field(init=False, default_factory=dict)
 
     @classmethod
     def create(
@@ -78,7 +78,7 @@ class llmHandler:
         log.info(f"[llm]Ollama[/] connecting to [bold]{host}[/] model=[bold]{llm_model}[/]")
         client = ollama.Client(host=host, headers=headers)
 
-        return cls(
+        llm_handler = cls(
             llm_model=llm_model,
             application_config=application_cfg,
             behaviour_config=behaviour_cfg,
@@ -87,6 +87,9 @@ class llmHandler:
             _llm_chat_fn=client.chat,
         )
 
+        llm_handler.cleanup()  # ensure clean state on init
+        return llm_handler
+
     def __del__(self) -> None:
         if self.prompt_database is not None:
             self.prompt_database.close()
@@ -94,6 +97,13 @@ class llmHandler:
     def cleanup(self) -> None:
         self.atom_database.atoms.clear()
         self.predicate_condition_cache.clear()
+        self.statistics.clear()
+
+        self.statistics["llm_calls"] = 0
+        self.statistics["total_time"] = 0.0
+        self.statistics["total_in_tokens"] = 0
+        self.statistics["total_out_tokens"] = 0
+
         log.debug("[info]Handler cleaned up[/]")
 
     def craft_message_history(self, prompt: str, context: str) -> list:
@@ -114,7 +124,13 @@ class llmHandler:
             if cached:
                 log.debug("[cache.hit]Cache HIT[/] — skipping LLM call")
                 try:
-                    return class_response.model_validate_json(cached[0])
+                    json_validated = class_response.model_validate_json(cached[0])
+                    log.debug("[cache.valid]Cache response valid JSON[/]")
+                    self.statistics["llm_calls"] += 1
+                    self.statistics["total_time"] += cached[1]
+                    self.statistics["total_in_tokens"] += cached[2]
+                    self.statistics["total_out_tokens"] += cached[3]
+                    return json_validated
                 except Exception as exc:
                     log.warning(f"[warning]Cache parse error:[/] {exc}")
 
@@ -138,6 +154,11 @@ class llmHandler:
                     resp["eval_count"],
                     resp["total_duration"],
                 )
+
+                self.statistics["llm_calls"] += 1
+                self.statistics["total_time"] += resp["total_duration"]
+                self.statistics["total_in_tokens"] += resp["prompt_eval_count"]
+                self.statistics["total_out_tokens"] += resp["eval_count"]
 
             return class_response.model_validate_json(content)
 
@@ -165,19 +186,28 @@ class llmHandler:
                         f"[cache.hit]Condition cache HIT[/] → skipping solver for"
                         f" [predicate]{pred}[/]"
                     )
-                    call_oracle, condition_results = True, []
+                    if not self.predicate_condition_cache.get(pred.conditions):
+                        log.debug(
+                            f"[cache]Cached result is FALSE[/]"
+                            f" — skipping [predicate]{pred}[/]"
+                        )
+                        continue
+
                 else:
                     call_oracle, condition_results = pred.execute_condition(
                         self.atom_database
                     )
-                    for cond, val in condition_results:
-                        self.predicate_condition_cache.update(cond, val)
 
-                if not call_oracle:
-                    log.debug(f"[warning]Condition FALSE[/] — skipping [predicate]{pred}[/]")
-                    continue
-                if not self.predicate_condition_cache.get(pred.conditions):
-                    continue
+                    if self.predicate_condition_cache.enabled:
+                        for cond, val in condition_results:
+                            self.predicate_condition_cache.update(cond, val)
+
+                    if not call_oracle:
+                        log.debug(
+                            f"[warning]Condition FALSE[/]"
+                            f" — skipping [predicate]{pred}[/]"
+                        )
+                        continue
 
             appl_mapping = behaviour_mapping.replace(
                 "{instructions}", pred.prompt_description
@@ -207,6 +237,14 @@ class llmHandler:
                     f"[bold]{len(extracted_facts.atoms)}[/] atom(s)"
                 )
                 kb_result = pred.execute_knowledge(self.atom_database, extracted_facts)
+                if kb_result.not_empty():
+                    log.info(
+                        f"[success]✓[/] KB execution for [predicate]{pred}[/] → "
+                        f"[bold]{len(kb_result.atoms)}[/] new atom(s)"
+                    )
+                    # Invalidate non-monotone cache entries as new atoms might affect conditions
+                    self.predicate_condition_cache.invalidate()
+                    
                 self.atom_database.atoms.extend(kb_result.atoms)
             else:
                 log.debug(f"[atom]Empty extraction[/] for [predicate]{pred}[/]")
@@ -222,3 +260,16 @@ class llmHandler:
 
     def get_extracted_atoms(self) -> atomList:
         return self.atom_database
+    
+    def get_statistics(self) -> dict:
+        stats = self.predicate_condition_cache.get_stats()
+        return {
+            "cache_hits": stats.get("hit_monotone", 0) + stats.get("hit_non_monotone", 0),
+            "cache_misses": stats.get("miss_monotone", 0) + stats.get("miss_non_monotone", 0),
+            "solver_skips": stats.get("solver_skip", 0),
+            "total_time": self.statistics.get("total_time", 0.0),
+            "llm_calls": self.statistics.get("llm_calls", 0),
+            "average_time_per_call": (self.statistics.get("total_time", 0.0) / self.statistics.get("llm_calls", 1)) if self.statistics.get("llm_calls", 0) > 0 else 0.0,
+            "total_in_tokens": self.statistics.get("total_in_tokens", 0),
+            "total_out_tokens": self.statistics.get("total_out_tokens", 0),
+        }

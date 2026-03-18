@@ -6,3 +6,4 @@ __pycache__/
 poetry.lock
 
 cached_prompts.db
+results/*

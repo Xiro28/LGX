@@ -161,9 +161,13 @@ class predicate:
                 has_model = has_model and check
                 condition_results.append((cond, check))
         else:
-            has_model = result.not_empty()
+            has_model = result.contain_atom_with_suffix(f"_0.")
             condition_results.append((self.conditions, has_model))
 
+        log.debug(
+            f"[predicate]Condition evaluation[/] for [bold]{self.defined_predicate}[/]"
+            f" has_model={has_model} details={condition_results}"
+        )
         return has_model, condition_results
 
     def execute_condition(self, atoms_database: atomList) -> Tuple[bool, List]:
