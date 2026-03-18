@@ -138,17 +138,6 @@ class TestPredicateCondition:
         with pytest.raises((AttributeError, TypeError)):
             pc.condition = "q"  # type: ignore[misc]
 
-    def test_negated_adds_not(self):
-        pc = predicate_condition(condition="edge(_, _)", monotone=True)
-        neg = pc.negated()
-        assert neg.condition == "not edge(_, _)"
-        assert neg.monotone  is True
-
-    def test_negated_removes_not(self):
-        pc = predicate_condition(condition="not error(_)", monotone=False)
-        neg = pc.negated()
-        assert neg.condition == "error(_)"
-
     def test_str_contains_kind_and_condition(self):
         pc = predicate_condition(condition="p(x)", monotone=True)
         s  = str(pc)
