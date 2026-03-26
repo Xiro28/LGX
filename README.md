@@ -56,7 +56,7 @@ poetry install
 If the objective is to inspect the artifact snapshot already included in the repository, no new benchmark execution is required. The checked-in JSON files under [`experiment_results/`](experiment_results) can be summarized directly:
 
 ```bash
-poetry run python generate_benchmark_table.py --format markdown
+poetry run python generate_benchmark_table.py
 ```
 
 This command reads the existing result files and produces a table aligned with the manuscript's Table 1 layout, and reported below.
@@ -84,9 +84,12 @@ This command reads the existing result files and produces a table aligned with t
 
 ## Re-running the Benchmarks from the Bundled Cache
 
-The repository ships with [`cached_prompt.db`](cached_prompt.db), which stores prompt/response pairs for previously executed oracle calls. When the benchmark is launched with `--skip_ollama`, the runner uses only this cache and does not contact an Ollama server.
 
-Run the manuscript models as follows:
+
+We release a cache for the oracle responses, which stores prompt/response pairs for previously executed oracle calls, at the link [cached_prompt.db](https://drive.google.com/file/d/1iQlOOg7Z3DA97lYcjUjWxqAqm67wLBKE/view?usp=sharing). 
+
+Once downloaded the cache, the benchmark can be launched with `--skip_ollama`. The runner will use only this cache and does not contact an Ollama server. 
+You can test the manuscript models as follows:
 
 ```bash
 poetry run python run_benchmark.py --model llama3.1:8b --skip_ollama
