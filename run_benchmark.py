@@ -27,7 +27,7 @@ class BenchmarkRunner:
         self.application_file = application_file_path
         
         self.output_file = self._generate_output_path(test_name, model)
-        self.llmasp = LLMASP("./behaviour/behaviour.lgx.yml", self.application_file, self.model)
+        self.lgx = LGX("./behaviour/behaviour.lgx.yml", self.application_file, self.model)
 
         self.statistics = {}
 
