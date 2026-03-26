@@ -1,0 +1,57 @@
+context: null
+
+strings:
+- labyrinth_description: |
+    There is an initial cell and a goal cell.
+    Cells are connected by adjacency relations.
+    Rows and columns can be shifted, modifying the connections.
+    The number of steps is bounded.
+
+
+extract:
+- size(value): 
+    prompt: | 
+        {labyrinth_description} 
+        
+        Identify the dimensions of the grid. 
+        The "value" is the size of the quadratic grid of fields (an integer).
+
+- init_on(x, y): 
+    prompt: | 
+        {labyrinth_description} 
+        
+        Identify the initial cell where the player or object starts. 
+        Extract the position as two integer coordinates: "x" (horizontal/column) and "y" (vertical/row).
+
+- goal_on(x, y): 
+    prompt: | 
+        {labyrinth_description} 
+        
+        Identify the goal or target cell that must be reached. 
+        Extract the position as two integer coordinates: "x" and "y".
+
+- connect(x, y, direction): 
+    prompt: | 
+        {labyrinth_description} 
+        
+        List all the connections between grid cells. 
+        For each connection, identify the starting cell coordinates "x" and "y" (integers) and the "direction" of the move.
+        
+        The "direction" must be exactly one of these lowercase characters: n, s, e, or w.
+
+- max_steps(value): 
+    prompt: | 
+        {labyrinth_description} 
+        
+        Identify the constraint on movement. 
+        The "value" is the maximum number of steps or moves allowed to solve the labyrinth (an integer).
+
+knowledge_base: |
+        field(X,Y) :- size(N), X = 1..N, Y = 1..N.
+        #show field/2.
+
+        #show init_on/2.
+        #show goal_on/2.
+        #show connect/3.
+        #show max_steps/1.
+

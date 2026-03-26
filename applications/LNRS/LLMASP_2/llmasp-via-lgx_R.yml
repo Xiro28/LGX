@@ -1,0 +1,80 @@
+
+context: null
+
+strings:
+- ricochetrobots_description: |
+    A grid has a fixed dimension.
+    Robots occupy grid cells.
+    Barriers block movement between cells.
+    Movement in a direction continues until a barrier or robot is encountered.
+    A target cell must be reached in a fixed number of moves.
+
+
+extract:
+- dim(value):
+    prompt: |
+        {ricochetrobots_description} 
+        
+        Identify the dimensions of the game board.
+        The "value" is the size (dimension) of one side of the square board (an integer).
+
+- pos(robot, x, y):
+    prompt: |
+        {ricochetrobots_description} 
+        
+        Identify the initial starting positions for all robots on the grid.
+        For each robot, extract the 'robot' name (e.g., its color), and its 'x' and 'y' coordinates (integers).
+
+- barrier(source_x, source_y, target_x, target_y, direction): 
+    prompt: |
+        {ricochetrobots_description} 
+        
+        Identify all barriers (walls) that block movement between adjacent cells. 
+        For each barrier, specify the starting cell (source_x, source_y), the adjacent cell it blocks (target_x, target_y), and the "direction" of the barrier relative to the source.
+        
+        The "direction" must be one of these lowercase strings: north, south, east, west.
+    knowledge_base: |
+        barrier(X,Y,X',Y',Dir) :- barrier(X',Y',X,Y,Dir).
+
+        barrier(X,Y,Dir) :- barrier(X,Y,X',Y',Dir), Dir == west,  (X',Y') == (X-1,Y).
+        barrier(X,Y,Dir) :- barrier(X,Y,X',Y',Dir), Dir == east,  (X',Y') == (X+1,Y).
+        barrier(X,Y,Dir) :- barrier(X,Y,X',Y',Dir), Dir == north, (X',Y') == (X,Y-1).
+        barrier(X,Y,Dir) :- barrier(X,Y,X',Y',Dir), Dir == south, (X',Y') == (X,Y+1).
+        
+        #show barrier/3.
+
+- target(robot, x, y):
+    prompt: |
+        {ricochetrobots_description} 
+        
+        Identify the goal objective of the puzzle.
+        Specify which 'robot' (unquoted string) must reach which 'x' and 'y' position (integers).
+
+- length(value): 
+    prompt: |
+        {ricochetrobots_description} 
+        
+        Identify the maximum move limit for the puzzle.
+        The "value" is the total number of moves allowed in the final plan (an integer).
+
+
+knowledge_base: |
+        dim(I-1) :- dim(I), I > 1.
+        #show dim/1.
+
+        #show pos/3.
+
+
+        barrier(X,Y,X',Y',Dir) :- barrier(X',Y',X,Y,Dir).
+
+        barrier(X,Y,Dir) :- barrier(X,Y,X',Y',Dir), Dir == west,  (X',Y') == (X-1,Y).
+        barrier(X,Y,Dir) :- barrier(X,Y,X',Y',Dir), Dir == east,  (X',Y') == (X+1,Y).
+        barrier(X,Y,Dir) :- barrier(X,Y,X',Y',Dir), Dir == north, (X',Y') == (X,Y-1).
+        barrier(X,Y,Dir) :- barrier(X,Y,X',Y',Dir), Dir == south, (X',Y') == (X,Y+1).
+        
+        #show barrier/3.
+        
+        
+        #show target/3.
+        #show length/1.
+

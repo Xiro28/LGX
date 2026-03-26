@@ -1,0 +1,48 @@
+context: null
+
+strings:
+- layered_graph_description: |
+    The text describes a (possibly layered) undirected graph.
+
+extract:
+- type(value): |
+    Determine if the graph is layered. Set the key "value" to layered if the input mentions layers or node-to-layer assignments. Otherwise, set "value" to unlayered.
+
+- layer_size(layer, number_of_nodes):
+    prompt: |
+        {layered_graph_description}
+        
+        Extract the capacity of each layer.
+        - First, look for explicit size declarations (e.g., 'Layer 1 has size 3' or 'all layers have 4 nodes').
+        - If a layer has no explicit size declaration, count the nodes assigned to it.
+        
+        Map the results to the 'layer_size' structure using the keys "layer" and "number_of_nodes".
+        
+        Example: "Layer 0 has 5 nodes but lists n1, n2." 
+        Result: {"layer": 0, "number_of_nodes": 5}
+
+- in_layer(layer, node):
+    prompt: |
+        {layered_graph_description}
+        
+        Based on the input, identify every node and the layer it belongs to. 
+        Map these into the 'in_layer' structure using the keys "layer" and "node".
+
+- edge(source, target):
+    prompt: |
+        {layered_graph_description}
+        
+        Identify all connections between nodes. For each connection, identify the 'source' node and the 'target' node.
+        Map these into the 'edge' structure using the keys "source" and "target".
+
+knowledge_base: |
+    #show type/1.
+    #show layer_size(X,Y) : layer_size(X,Y), type(layered).
+    
+    warning(unmatched_layer_size, (Layer,Size,Cnt)) :-  type(layered), layer_size(Layer,Size), Cnt = #count{Node : in_layer(Layer,Node)}, Size != Cnt.  
+
+    #show in_layer(X,Y) : in_layer(X,Y), type(layered), layer_size(_,_).
+    #show warning(X,Y) : warning(X,Y), type(layered), layer_size(_,_).
+
+    edge(X,Y) :- edge(Y,X).        
+    #show edge(X,Y) : edge(X,Y), not warning(unmatched_layer_size, _).

@@ -1,159 +1,140 @@
 import logging
 import ollama
+import sqlite3
 import os
-from dataclasses import dataclass, field
-from typing import Any, Generator, Optional
-from typeguard import typechecked
 
-# Assumo che questi siano importati correttamente dal tuo progetto
-from src.core.atom_list import atomList
-from src.core.prompt_database import promptDatabase
-from src.helpers.filter_atoms import filter_asp_atoms
-from src.core.yaml_parser import application_configuration, behaviour_configuration
-from src.core.cache import ConditionCache
-from src.core.predicate import predicate
+from src.utils.statistics   import Statistics
 
-@typechecked
-@dataclass(frozen=True)
-class llmHandler:
-    llm_model: str
-    application_config: application_configuration
-    behaviour_config: behaviour_configuration
-    prompt_database: Optional[promptDatabase]
-    predicate_condition_cache: ConditionCache
-    _llm_chat_fn: Any 
+class LLMHandler:
 
-    atom_database: atomList = field(init=False, default=atomList(atoms=[]))
+    def __init__(self, llm_model: str, system_prompt: str) -> None:
 
-    @classmethod
-    def create(cls, 
-               llm_model: str, 
-               application_cfg: application_configuration, 
-               behaviour_cfg: behaviour_configuration) -> "llmHandler":
-        
-        use_cached_prompts = os.getenv("LGX_ENABLE_PROMPT_CACHE", "true").lower() == "true"
+        assert system_prompt is not None, "The system prompt must not be None."
+        assert system_prompt is not None, "The system prompt must not be empty."
 
-        if use_cached_prompts:
-            database = os.getenv("LGX_USE_DB_FILENAME", "cached_prompts.db")
-            db = promptDatabase.initialize(database)
+        self.llm_model = llm_model
+        self.system_prompt = system_prompt
+
+        self.conn = sqlite3.connect('cached_prompt.db')
+        self.cursor = self.conn.cursor()
+
+        timeout = os.getenv("LGX_OLLAMA_TIMEOUT", 60.0 * 15)
+
+
+        ollama_url = os.getenv("LGX_OLLAMA_URL", "")
+        ollama_api = os.getenv("LGX_OLLAMA_KEY", "")
+
+        if os.getenv("LGX_SKIP_OLLAMA", "false").lower() == "false":
+
+            assert ollama_url != "", "OLLAMA_URL environment variable must be set. Use LGX_OLLAMA_URL to set it."
+            
+            if ollama_api == "":
+                logging.warning("Warning: OLLAMA_KEY environment variable is not set. Use LGX_OLLAMA_KEY to set it for authentication.")
+
+                self.__llm_client = ollama.Client(host=ollama_url, timeout=timeout)
+                self.__llm = self.__llm_client.chat
+            else:
+                logging.info("Using OLLAMA_KEY for authentication.")
+
+                self.__llm_client = ollama.Client(host=ollama_url, timeout=timeout, headers={
+                    'Authorization': f'Bearer {ollama_api}'    
+                })
+                self.__llm = self.__llm_client.chat
+
+            #self.__llm_client.pull(self.llm_model)
+            
+            response = self.__llm_client.ps()
+
+            for model in response.models:
+                logging.info(model.model, model.size, model.size_vram)
         else:
-            db = None
+            self.__llm_client = None
+            self.__llm = None 
 
-        use_condition_cache = os.getenv("LGX_ENABLE_CONDITION_CACHE", "true").lower() == "true"
-        condition_cache_mode = os.getenv("LGX_CONDITION_CACHE_MODE", "all").lower()
-        cache = ConditionCache(use_condition_cache, condition_cache_mode)
-
-        headers = {}
-        if api_key := os.getenv("LGX_OLLAMA_API_KEY"):
-            headers['Authorization'] = f'Bearer {api_key}'
-        
-        client = ollama.Client(
-            host=os.getenv("LGX_OLLAMA_URL", "http://localhost:1143"), 
-            headers=headers
-        )
-
-        return cls(
-            llm_model=llm_model,
-            application_config=application_cfg,
-            behaviour_config=behaviour_cfg,
-            prompt_database=db,
-            predicate_condition_cache=cache,
-            _llm_chat_fn=client.chat # Passiamo direttamente il metodo callable
-        )
+        # create the table if it does not exist
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS prompt_cache (
+                prompt TEXT,
+                llm_model TEXT,
+                configuration TEXT,
+                response TEXT,
+                token_in INTEGER,
+                token_out INTEGER,
+                extraction_time INTEGER,
+                PRIMARY KEY (prompt, llm_model, configuration)
+            )
+        ''')
 
     def __del__(self):
-        if self.prompt_database is not None:
-            self.prompt_database.close()
+        self.conn.close()
 
-    def craft_message_history(self, prompt: str, context: str) -> list:
-        return [
-            {"role": "system", "content": f"{self.behaviour_config.init}{context}"},
-            {"role": "user", "content": prompt}
-        ]
+    def __to_llm_dict__(self, role: str, text: str) -> dict:
+        return {"role": role, "content": text}
+    
+    def invoke_llm_constrained(self, prompt: str, class_response: any, context: any) -> dict | str:
+        configuration = {'temperature': 0, "top_p": 0.1}
+        grammar = class_response
 
-    # the return value here is the class dynamic built class so use ANY to cover all of them
-    def invoke_llm_constrained(self, prompt: str, class_response: any, context: str) -> Optional[Any]: 
-        configuration = {'temperature': 0}
-        grammar = class_response.model_json_schema(mode='serialization')
-        history = self.craft_message_history(prompt, context)
+        # if it's not a user defined grammar, convert the passed class to a grammar 
+        if type(class_response) != str:
+            grammar = class_response.model_json_schema(mode='serialization')
 
-        if self.prompt_database is not None:
-            query_result = self.prompt_database.get_cached_response(history, self.llm_model, configuration)
-            if query_result:
-                try:
-                    return class_response.model_validate_json(query_result[0])
-                except Exception as e:
-                    print(e)
-                    #self.prompt_database.delete_cached_response(history, self.llm_model, configuration)
+        if (context != ""):
+            _messages = [
+                self.__to_llm_dict__("system", f"{self.system_prompt}\n{context}"), 
+                self.__to_llm_dict__("user", f"{prompt}"),
+            ]
+        else:
+            _messages = [
+                self.__to_llm_dict__("system", f"{self.system_prompt}"), 
+                self.__to_llm_dict__("user", f"{prompt}"),
+            ]
 
-        try:
-            llm_response = self._llm_chat_fn(
-                model=self.llm_model,
-                messages=history,
-                options=configuration,
-                format=grammar
-            )
+        self.cursor.execute('SELECT response, token_in, token_out, extraction_time FROM prompt_cache WHERE prompt = ? and llm_model = ? and configuration = ?', (str(_messages), self.llm_model, str(configuration)))
+        row = self.cursor.fetchone()
+
+        if row:
+            # with open("prompt.txt", "a") as f:
+            #     f.writelines(str(_messages))
+            #     f.writelines(row[0])
+
+            Statistics.log_llm_call(row[1], row[2])
+            Statistics.log_llm_call_duration(row[3])
+            try:
+                return class_response.model_validate_json(row[0])
+            except Exception as e:
+                logging.error(e)
+                return ""
             
-            content = llm_response["message"]["content"]
+        if self.__llm is None:
+            logging.info("LLM calls are skipped. Returning empty string.")
+            return ""
 
-            if self.prompt_database is not None:
-                self.prompt_database.cache_response(
-                    history, self.llm_model, configuration, content, 
-                    llm_response["prompt_eval_count"], 
-                    llm_response["eval_count"], 
-                    llm_response["total_duration"]
-                )
+        _ret = self.__llm(
+            model=self.llm_model,
+            messages=_messages,
+            format = grammar,
+            stream=False,
+            options=configuration
+        )
 
-            return class_response.model_validate_json(content)
+        token_out = _ret["eval_count"]
+        token_in = _ret["prompt_eval_count"]
+        extraction_time = _ret["total_duration"]
+
+        _ret = _ret["message"]["content"]
+  
+        try:
+            self.cursor.execute('INSERT INTO prompt_cache (prompt, llm_model, configuration, response, token_in, token_out, extraction_time) VALUES (?, ?, ?, ?, ?, ?, ?)', (str(_messages), self.llm_model, str(configuration), _ret, token_in, token_out, extraction_time ))
+            self.conn.commit()
+
+            Statistics.log_llm_call(token_in, token_out)
+            Statistics.log_llm_call_duration(extraction_time)
+
+            if type(class_response) != str:
+                return class_response.model_validate_json(_ret)
+            
+            return _ret
         except Exception as e:
-            logging.error(f"Error invoking/validating LLM: {e}")
+            logging.error("Errore durante l'inferenza", exc_info=True)
             return None
-
-    def _structured_output_call(self, prompt: str) -> Generator[tuple[Any, predicate], None, None]:
-        behaviour_context = ""
-        behaviour_mapping = self.behaviour_config.mapping.replace("{input}", prompt)
-        
-        if self.application_config.context:
-            behaviour_context = self.behaviour_config.context.replace("{context}", f"{self.application_config.context}")
-        
-        for pred in self.application_config.predicates:
-            if pred.has_condition():
-                if not self.predicate_condition_cache.skip_logic_solver(pred.conditions): 
-                    # Evaluate the program
-                    call_oracle, condition_results = pred.execute_condition(self.atom_database)
-
-                    for result in condition_results:
-                        self.predicate_condition_cache.update(result[0], result[1])
-                    
-                    if not call_oracle:
-                        continue
-                elif not self.predicate_condition_cache.get(pred.conditions):
-                    continue
-
-
-            appl_mapping = behaviour_mapping.replace("{instructions}", f"{pred.prompt_description}")
-            appl_mapping = appl_mapping.replace("{atom}", pred.predicate_formatted)
-
-            yield self.invoke_llm_constrained(appl_mapping, pred.get_grammar(), behaviour_context), pred
-
-    def run(self, prompt: str) -> atomList:
-
-        for response, pred in self._structured_output_call(prompt):
-            if response is None:
-                continue
-
-            atom_strings = pred.parse_response(response)
-            extracted_facts = filter_asp_atoms("\n".join(atom_strings))
-
-            if extracted_facts.not_empty():
-                kb_execution_result = pred.execute_knowledge(self.atom_database, extracted_facts)
-                self.atom_database.atoms.extend(kb_execution_result.atoms)
-
-        return self.atom_database
-    
-    def get_extracted_atoms(self) -> atomList:
-        return self.atom_database
-    
-    def cleanup(self):
-        self.atom_database.atoms.clear()
-        self.predicate_condition_cache.clear()

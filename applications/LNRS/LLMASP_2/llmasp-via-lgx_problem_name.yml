@@ -1,0 +1,59 @@
+context: null
+
+strings:
+- labyrinth_description: |
+    There is an initial cell and a goal cell.
+    Cells are connected by adjacency relations.
+    Rows and columns can be shifted, modifying the connections.
+    The number of steps is bounded.
+
+- nomystery_description: |
+    Locations are connected by weighted edges.
+    Being at a location and having a fuel amount are state properties.
+    Traversing an edge consumes fuel according to its cost.
+    All goal locations must be reached within the available fuel.
+
+- ricochetrobots_description: |
+    A grid has a fixed dimension.
+    Robots occupy grid cells.
+    Barriers block movement between cells.
+    Movement in a direction continues until a barrier or robot is encountered.
+    A target cell must be reached in a fixed number of moves.
+
+- sokoban_description: |
+    A warehouse grid contains a player and stones occupying floor cells.
+    Movement is directional across adjacent locations.
+    A stone can be pushed only if the next cell is clear.
+    Goal stones must eventually be placed on designated storage (goal) cells.
+
+    
+extract:
+- problem_name(name): 
+    prompt: |
+        Tell me the name of the problem that best match the text in INPUT.
+        Choose from the following options: [labyrinth, nomystery, ricochetrobots, sokoban]
+        
+        
+        Here is a description of each problem:
+        
+        labyrinth:
+        {labyrinth_description}
+        Predicates: field/2, init_on/2, goal_on/2, connect/3, max_steps/1
+        
+        
+        nomystery:
+        {nomystery_description}
+        Predicates: fuelcost/3, at/2, fuel/2, goal/2, step/1
+        
+        
+        ricochetrobots:
+        {ricochetrobots_description}
+        Predicates: dim/1, pos/3, barrier/3, target/3, length/1
+        
+        
+        sokoban:
+        {sokoban_description}
+        Predicates: at/2, clear/2, isgoal/1, isnongoal/1, goal/1, player/1, steps/1, movedir/3
+
+  
+knowledge_base: null

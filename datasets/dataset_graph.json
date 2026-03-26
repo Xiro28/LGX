@@ -1,0 +1,302 @@
+[
+  {
+    "problem_name": "layered_graph",
+    "text": "The graph has three layers (with id 0,1, and 2), each layer containing three nodes. Layer zero contains nodes n1, n2, and n3, while layer 2 contains nodes n7, and n9. There is an edge between n1 and n9, and node n4 is connected to n2 and n8.",
+    "output": "type(layered).\nlayer_size(0,3).\nlayer_size(1,3).\nlayer_size(2,3).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(0,n3).\nin_layer(2,n7).\nin_layer(2,n9).\nwarning(unmatched_layer_size, (1,3,0)).\nwarning(unmatched_layer_size, (2,3,2))."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "The graph has layer 0 with 3 nodes, layer 1 with three nodes, and layer 2 has the same number of nodes as layer 1. Layer zero contains nodes n1, n2, and n3, while layer 2 contains nodes n7, n8, and n9, the last two nodes are connected. Every layer has three nodes. There is an edge between n1 and n9, and node n4 is connected to n2 and n8. Finally, layer 1 contains nodes n4, n5, and n6.",
+    "output": "type(layered).\nlayer_size(0,3).\nlayer_size(1,3).\nlayer_size(2,3).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(0,n3).\nin_layer(1,n4).\nin_layer(1,n5).\nin_layer(1,n6).\nin_layer(2,n7).\nin_layer(2,n8).\nin_layer(2,n9).\nedge(n1,n9).\nedge(n4,n2).\nedge(n4,n8).\nedge(n8,n9).\nedge(n9,n1).\nedge(n2,n4).\nedge(n8,n4).\nedge(n9,n8)."
+  },
+    {
+    "problem_name": "layered_graph",
+    "text": "There is an edge between n3 and n9, and node n1 is connected to n2 and n4.",
+    "output": "type(unlayered).\nedge(n3,n9).\nedge(n9,n3).\nedge(n1,n2).\nedge(n2,n1).\nedge(n1,n4).\nedge(n4,n1)."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "Nodes n8 and n9 are connected. There is an edge between n1 and n9, and node n4 is connected to n2 and n8.",
+    "output": "type(unlayered).\nedge(n1,n9).\nedge(n4,n2).\nedge(n4,n8).\nedge(n8,n9).\nedge(n9,n1).\nedge(n2,n4).\nedge(n8,n4).\nedge(n9,n8)."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "There is an edge between n1 and n2, node n2 is connected to n3, and node n4 is connected to n1 and n3.",
+    "output": "type(unlayered).\nedge(n1,n2).\nedge(n2,n1).\nedge(n2,n3).\nedge(n3,n2).\nedge(n4,n1).\nedge(n1,n4).\nedge(n4,n3).\nedge(n3,n4)."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "The graph has layer 0 with 2 nodes and layer 1 with 3 nodes. Layer zero contains nodes n1 and n2, while layer 1 contains nodes n3, n4, and n5. There is an edge between n1 and n5, and node n2 is connected to n3 and n4.",
+    "output": "type(layered).\nlayer_size(0,2).\nlayer_size(1,3).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(1,n3).\nin_layer(1,n4).\nin_layer(1,n5).\nedge(n1,n5).\nedge(n5,n1).\nedge(n2,n3).\nedge(n3,n2).\nedge(n2,n4).\nedge(n4,n2)."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "The graph has three layers: layer 0 has 3 nodes, layer 1 has 2 nodes, and layer 2 has the same number of nodes as layer 1. Layer zero contains nodes n1, n2, and n3; layer 1 contains nodes n4 and n5; and layer 2 contains nodes n6 and n7. There is an edge between n2 and n6, node n3 is connected to n5 and n7, and the two nodes in layer 2 are connected.",
+    "output": "type(layered).\nlayer_size(0,3).\nlayer_size(1,2).\nlayer_size(2,2).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(0,n3).\nin_layer(1,n4).\nin_layer(1,n5).\nin_layer(2,n6).\nin_layer(2,n7).\nedge(n2,n6).\nedge(n6,n2).\nedge(n3,n5).\nedge(n5,n3).\nedge(n3,n7).\nedge(n7,n3).\nedge(n7,n6).\nedge(n6,n7)."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "The graph has four layers (0,1,2,3), each layer containing three nodes. Layer 0 contains nodes n1, n2, and n3; layer 1 contains nodes n4, n5, and n6; layer 2 contains nodes n7, n8, and n9; and layer 3 contains nodes n10, n11, and n12. There is an edge between n1 and n12, and node n4 is connected to n7.",
+    "output": "type(layered).\nlayer_size(0,3).\nlayer_size(1,3).\nlayer_size(2,3).\nlayer_size(3,3).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(0,n3).\nin_layer(1,n4).\nin_layer(1,n5).\nin_layer(1,n6).\nin_layer(2,n7).\nin_layer(2,n8).\nin_layer(2,n9).\nin_layer(3,n10).\nin_layer(3,n11).\nin_layer(3,n12).\nedge(n1,n12).\nedge(n12,n1).\nedge(n4,n7).\nedge(n7,n4)."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "The graph has five layers (0 to 4). Layer 0 has 2 nodes, layer 1 has 3 nodes, layer 2 has the same number of nodes as layer 1, layer 3 has 1 node, and layer 4 has the same number of nodes as layer 0. Layer 0 contains nodes n1 and n2; layer 1 contains nodes n3, n4, and n5; layer 2 contains nodes n6, n7, and n8; layer 3 contains node n9; and layer 4 contains nodes n10 and n11. Node n1 is connected to every node in layer 1, there is an edge between n8 and n9, and node n10 is connected to n6 and n9.",
+    "output": "type(layered).\nlayer_size(0,2).\nlayer_size(1,3).\nlayer_size(2,3).\nlayer_size(3,1).\nlayer_size(4,2).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(1,n3).\nin_layer(1,n4).\nin_layer(1,n5).\nin_layer(2,n6).\nin_layer(2,n7).\nin_layer(2,n8).\nin_layer(3,n9).\nin_layer(4,n10).\nin_layer(4,n11).\nedge(n1,n3).\nedge(n3,n1).\nedge(n1,n4).\nedge(n4,n1).\nedge(n1,n5).\nedge(n5,n1).\nedge(n8,n9).\nedge(n9,n8).\nedge(n10,n6).\nedge(n6,n10).\nedge(n10,n9).\nedge(n9,n10)."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "The graph has three layers (0,1,2), each layer containing four nodes. Layer 0 contains nodes n1, n2, n3, and n4; layer 1 contains nodes n5, n6, n7, and n8; and layer 2 contains nodes n9, n10, n11, and n12. Node n2 is connected to n6, n9, and n12. There is an edge between n4 and n7. The nodes n10 and n11 are connected. Finally, node n5 is connected to n1 and n3.",
+    "output": "type(layered).\nlayer_size(0,4).\nlayer_size(1,4).\nlayer_size(2,4).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(0,n3).\nin_layer(0,n4).\nin_layer(1,n5).\nin_layer(1,n6).\nin_layer(1,n7).\nin_layer(1,n8).\nin_layer(2,n9).\nin_layer(2,n10).\nin_layer(2,n11).\nin_layer(2,n12).\nedge(n2,n6).\nedge(n6,n2).\nedge(n2,n9).\nedge(n9,n2).\nedge(n2,n12).\nedge(n12,n2).\nedge(n4,n7).\nedge(n7,n4).\nedge(n10,n11).\nedge(n11,n10).\nedge(n5,n1).\nedge(n1,n5).\nedge(n5,n3).\nedge(n3,n5)."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "There is an edge between n1 and n2, between n2 and n3, between n3 and n4, and between n4 and n1. Node n5 is connected to n2 and n4, and node n6 is connected to n5.",
+    "output": "type(unlayered).\nedge(n1,n2).\nedge(n2,n1).\nedge(n2,n3).\nedge(n3,n2).\nedge(n3,n4).\nedge(n4,n3).\nedge(n4,n1).\nedge(n1,n4).\nedge(n5,n2).\nedge(n2,n5).\nedge(n5,n4).\nedge(n4,n5).\nedge(n6,n5).\nedge(n5,n6)."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "The graph has four layers (0 to 3). Layer 0 has 2 nodes, layer 1 has the same number of nodes as layer 0, layer 3 has 1 node, and layer 2 has 3 nodes. Layer 0 contains nodes n1 and n2; layer 1 contains nodes n3 and n4; layer 2 contains nodes n5, n6, and n7; and layer 3 contains node n8. Node n1 is connected to n5 and n7. There is an edge between n4 and n8. Finally, n2 and n3 are connected.",
+    "output": "type(layered).\nlayer_size(0,2).\nlayer_size(1,2).\nlayer_size(2,3).\nlayer_size(3,1).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(1,n3).\nin_layer(1,n4).\nin_layer(2,n5).\nin_layer(2,n6).\nin_layer(2,n7).\nin_layer(3,n8).\nedge(n1,n5).\nedge(n5,n1).\nedge(n1,n7).\nedge(n7,n1).\nedge(n4,n8).\nedge(n8,n4).\nedge(n2,n3).\nedge(n3,n2)."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "The graph has three layers (0,1,2). Layer 0 has 2 nodes, and layers 1 and 2 each have 3 nodes. Layer 0 contains nodes n1 and n2; layer 1 contains nodes n3, n4, and n5; and layer 2 contains nodes n6, n7, and n8. There is an edge between n2 and n8, and node n4 is connected to n6 and n7.",
+    "output": "type(layered).\nlayer_size(0,2).\nlayer_size(1,3).\nlayer_size(2,3).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(1,n3).\nin_layer(1,n4).\nin_layer(1,n5).\nin_layer(2,n6).\nin_layer(2,n7).\nin_layer(2,n8).\nedge(n2,n8).\nedge(n8,n2).\nedge(n4,n6).\nedge(n6,n4).\nedge(n4,n7).\nedge(n7,n4)."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "The graph has five layers (0,1,2,3,4). Layers 0 and 4 each contain two nodes; layer 1 contains three nodes; layer 2 contains one node; and layer 3 contains two nodes. Layer 0 contains nodes n1 and n2, layer 1 contains nodes n3, n4, and n5, layer 2 contains node n6, layer 3 contains nodes n7 and n8, and layer 4 contains nodes n9 and n10. Every node in layer 0 is connected to every node in layer 4. In addition, node n6 is connected to n4 and n9, and the two nodes in layer 3 are connected.",
+    "output": "type(layered).\nedge(n6,n4).\nedge(n6,n9).\nedge(n7,n8).\nedge(n1,n9).\nedge(n2,n9).\nedge(n1,n10).\nedge(n2,n10).\nedge(n10,n2).\nedge(n10,n1).\nedge(n9,n2).\nedge(n9,n1).\nedge(n8,n7).\nedge(n9,n6).\nedge(n4,n6).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(1,n3).\nin_layer(1,n4).\nin_layer(1,n5).\nin_layer(2,n6).\nin_layer(3,n7).\nin_layer(3,n8).\nin_layer(4,n9).\nin_layer(4,n10).\nlayer_size(0,2).\nlayer_size(1,3).\nlayer_size(2,1).\nlayer_size(3,2).\nlayer_size(4,2)."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "There is an edge between n11 and n12. Node n12 is connected to n13, n14, and n15. Finally, n13 and n15 are connected.",
+    "output": "type(unlayered).\nedge(n11,n12).\nedge(n12,n11).\nedge(n12,n13).\nedge(n13,n12).\nedge(n12,n14).\nedge(n14,n12).\nedge(n12,n15).\nedge(n15,n12).\nedge(n13,n15).\nedge(n15,n13)."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "The graph has six layers (0 to 5). Layers 0, 1, and 2 each have 2 nodes, layers 3 and 4 each have 3 nodes, and layer 5 has 1 node. Layer 0 contains nodes n1 and n2; layer 1 contains nodes n3 and n4; layer 2 contains nodes n5 and n6; layer 3 contains nodes n7, n8, and n9; layer 4 contains nodes n10, n11, and n12; and layer 5 contains node n13. Every node in layer 1 is connected to node n13. Node n2 is connected to all nodes in layer 3. There is an edge between n6 and n10, and the last two nodes in layer 4 (n11 and n12) are connected. Finally, node n5 is connected to n3 and n12.",
+    "output": "type(layered).\nlayer_size(0,2).\nlayer_size(1,2).\nlayer_size(2,2).\nlayer_size(3,3).\nlayer_size(4,3).\nlayer_size(5,1).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(1,n3).\nin_layer(1,n4).\nin_layer(2,n5).\nin_layer(2,n6).\nin_layer(3,n7).\nin_layer(3,n8).\nin_layer(3,n9).\nin_layer(4,n10).\nin_layer(4,n11).\nin_layer(4,n12).\nin_layer(5,n13).\nedge(n3,n13).\nedge(n13,n3).\nedge(n4,n13).\nedge(n13,n4).\nedge(n2,n7).\nedge(n7,n2).\nedge(n2,n8).\nedge(n8,n2).\nedge(n2,n9).\nedge(n9,n2).\nedge(n6,n10).\nedge(n10,n6).\nedge(n11,n12).\nedge(n12,n11).\nedge(n5,n3).\nedge(n3,n5).\nedge(n5,n12).\nedge(n12,n5)."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "The graph has two layers (0 and 1) of size 2. Layer 0 contains n1 and n2, but layer 1 only contains n3. An edge exists between n1 and n3.",
+    "output": "type(layered).\nlayer_size(0,2).\nlayer_size(1,2).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(1,n3).\nwarning(unmatched_layer_size, (1,2,1))."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "There are three layers. Layer 0 has size 3 and contains n1, n2, n3. Layer 1 has size 2 and contains n4. Layer 2 has size 1 and contains n5. Node n1 is connected to n4.",
+    "output": "type(layered).\nlayer_size(0,3).\nlayer_size(1,2).\nlayer_size(2,1).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(0,n3).\nin_layer(1,n4).\nin_layer(2,n5).\nwarning(unmatched_layer_size, (1,2,1))."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "A 3-layer graph where each layer has 2 nodes. Layer 0 has n1, n2. Layer 1 has n3, n4. Layer 2 has n5. There is an edge between n2 and n3.",
+    "output": "type(layered).\nlayer_size(0,2).\nlayer_size(1,2).\nlayer_size(2,2).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(1,n3).\nin_layer(1,n4).\nin_layer(2,n5).\nwarning(unmatched_layer_size, (2,2,1))."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "Layer 0 and 1 both have a size of 4. Layer 0 contains n1, n2, n3, n4. Layer 1 only lists n5 and n6. Node n1 connects to n5.",
+    "output": "type(layered).\nlayer_size(0,4).\nlayer_size(1,4).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(0,n3).\nin_layer(0,n4).\nin_layer(1,n5).\nin_layer(1,n6).\nwarning(unmatched_layer_size, (1,4,2))."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "The graph has layers 0, 1, and 2 with sizes 2, 3, and 2 respectively. Layer 0 has n1, n2; layer 1 has n3, n4, n5; and layer 2 has n6. n2 is linked to n6.",
+    "output": "type(layered).\nlayer_size(0,2).\nlayer_size(1,3).\nlayer_size(2,2).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(1,n3).\nin_layer(1,n4).\nin_layer(1,n5).\nin_layer(2,n6).\nwarning(unmatched_layer_size, (2,2,1))."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "Each of the three layers (0-2) has 3 nodes. Layer 0: n1, n2. Layer 1: n4, n5, n6. Layer 2: n7, n8, n9. Node n2 is connected to n4.",
+    "output": "type(layered).\nlayer_size(0,3).\nlayer_size(1,3).\nlayer_size(2,3).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(1,n4).\nin_layer(1,n5).\nin_layer(1,n6).\nin_layer(2,n7).\nin_layer(2,n8).\nin_layer(2,n9).\nwarning(unmatched_layer_size, (0,3,2))."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "Layer 0 has 5 nodes but only n1, n2, n3 are mentioned. Layer 1 has 1 node, n4. There is an edge from n1 to n4.",
+    "output": "type(layered).\nlayer_size(0,5).\nlayer_size(1,1).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(0,n3).\nin_layer(1,n4).\nwarning(unmatched_layer_size, (0,5,3))."
+  },
+  {
+    "problem_name": "layered_graph",
+"text": "The graph consists of 4 layers, each with a size of 2. Layer 0 contains n1 and n2. Layer 1 contains n3 and n4. Layer 2 contains node n5. Layer 3 contains n6 and n7. Regarding connectivity, n4 is connected to n6, and n1 is linked to both nodes in layer 1. Additionally, there is an edge between n2 and n5, and the nodes in layer 3 are connected to each other.",
+  "output": "type(layered).\nlayer_size(0,2).\nlayer_size(1,2).\nlayer_size(2,2).\nlayer_size(3,2).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(1,n3).\nin_layer(1,n4).\nin_layer(2,n5).\nin_layer(3,n6).\nin_layer(3,n7).\nwarning(unmatched_layer_size, (2,2,1))."
+  },
+  {
+    "problem_name": "layered_graph",
+"text": "The graph has three layers, each with a size of 3. Layer 0 contains n1, n2, and n3. Layer 1 contains nodes n4 and n5. Layer 2 consists of n6, n7, and n8. In terms of edges, n3 is connected to n6, while n1 is connected to every node in layer 2. Furthermore, n4, n5, and n7 form a connected chain, and node n8 is linked back to n2.",
+  "output": "type(layered).\nlayer_size(0,3).\nlayer_size(1,3).\nlayer_size(2,3).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(0,n3).\nin_layer(1,n4).\nin_layer(1,n5).\nin_layer(2,n6).\nin_layer(2,n7).\nin_layer(2,n8).\nwarning(unmatched_layer_size, (1,3,2))."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "There are two layers. Layer 0 has size 2 and nodes n1, n2. Layer 1 has size 4 and nodes n3, n4. Regarding the connections, n2 and n3 are connected, and n1 is linked to all nodes currently in layer 1. Additionally, n4 has an edge leading back to n2, and n1 is connected to n2.",
+    "output": "type(layered).\nlayer_size(0,2).\nlayer_size(1,4).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(1,n3).\nin_layer(1,n4).\nwarning(unmatched_layer_size, (1,4,2))."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "Graph layers 0 and 1 have size 3. Layer 0 contains only n1. Layer 1 consists of n4, n5, and n6. In this arrangement, n1 is linked to n4, and there are additional edges connecting n1 to both n5 and n6. Furthermore, n4 and n5 are connected to each other within their layer.",
+      "output": "type(layered).\nlayer_size(0,3).\nlayer_size(1,3).\nin_layer(0,n1).\nin_layer(1,n4).\nin_layer(1,n5).\nin_layer(1,n6).\nwarning(unmatched_layer_size, (0,3,1))."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "Layer 0 (size 2) has n1, n2. Layer 1 (size 2) has n3, n4. Layer 2 (size 2) has n5. n4 and n5 have an edge.",
+    "output": "type(layered).\nlayer_size(0,2).\nlayer_size(1,2).\nlayer_size(2,2).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(1,n3).\nin_layer(1,n4).\nin_layer(2,n5).\nwarning(unmatched_layer_size, (2,2,1))."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "Three layers of size 4. Layer 0 contains n1, n2. Layer 1 contains n3, n4, n5, n6. Layer 2 contains n7, n8, n9, n10. n2 is connected to n7.",
+    "output": "type(layered).\nlayer_size(0,4).\nlayer_size(1,4).\nlayer_size(2,4).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(1,n3).\nin_layer(1,n4).\nin_layer(1,n5).\nin_layer(1,n6).\nin_layer(2,n7).\nin_layer(2,n8).\nin_layer(2,n9).\nin_layer(2,n10).\nwarning(unmatched_layer_size, (0,4,2))."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "The graph is structured in three layers of size 2. Layer 0 has n1 and n2; layer 1 has n3 and n4; and layer 2 contains only n5. Regarding edges, n4 and n5 have an edge, and every node in layer 0 is connected to n3. Additionally, n1 and n2 are connected to each other, and n4 is linked to n5.",
+    "output": "type(layered).\nlayer_size(0,2).\nlayer_size(1,2).\nlayer_size(2,2).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(1,n3).\nin_layer(1,n4).\nin_layer(2,n5).\nwarning(unmatched_layer_size, (2,2,1))."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "Each of the 2 layers has size 3. Layer 0: n1, n2, n3. Layer 1: n4. There is an edge between n3 and n4.",
+    "output": "type(layered).\nlayer_size(0,3).\nlayer_size(1,3).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(0,n3).\nin_layer(1,n4).\nwarning(unmatched_layer_size, (1,3,1))."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "The graph has layers 0, 1, and 2, each intended to hold 2 nodes. Layer 0 currently contains only n1. Layer 1 contains n2 and n3, while layer 2 contains n4 and n5. In this setup, n1 is connected to n2, and n1 also maintains a connection to n3. Furthermore, both nodes in layer 1 are connected to n4, and n5 is linked back to n3.",
+    "output": "type(layered).\nlayer_size(0,2).\nlayer_size(1,2).\nlayer_size(2,2).\nin_layer(0,n1).\nin_layer(1,n2).\nin_layer(1,n3).\nin_layer(2,n4).\nin_layer(2,n5).\nwarning(unmatched_layer_size, (0,2,1))."
+  },
+{
+  "problem_name": "layered_graph",
+  "text": "The graph has two layers of size 2. Layer 0 contains n1 and n2, while layer 1 contains n3 and n4. Node n1 is connected to both n3 and n4. Additionally, n2 is linked to n3.",
+  "output": "type(layered).\nlayer_size(0,2).\nlayer_size(1,2).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(1,n3).\nin_layer(1,n4).\nedge(n1,n3).\nedge(n3,n1).\nedge(n1,n4).\nedge(n4,n1).\nedge(n2,n3).\nedge(n3,n2)."
+},
+{
+  "problem_name": "layered_graph",
+  "text": "The graph has three layers. Layer 0 has size 2 and contains n10 and n11. Layer 1 has the same size as layer 0 and contains n20 and n21. Layer 2 has size 1 and contains n30. Regarding edges, n10 is connected to n20, n21 is connected to n30, and the two nodes in layer 1 are linked together.",
+  "output": "type(layered).\nlayer_size(0,2).\nlayer_size(1,2).\nlayer_size(2,1).\nin_layer(0,n10).\nin_layer(0,n11).\nin_layer(1,n20).\nin_layer(1,n21).\nin_layer(2,n30).\nedge(n10,n20).\nedge(n20,n10).\nedge(n21,n30).\nedge(n30,n21).\nedge(n20,n21).\nedge(n21,n20)."
+},
+{
+  "problem_name": "layered_graph",
+  "text": "There are three layers. Layer 0 (size 1) has n1. Layer 1 (size 1) has n2. Layer 2 (size 2) has n3 and n4. Node n1 is connected to n2, and n1 is also connected directly to n4. Finally, n2 and n3 have an edge.",
+  "output": "type(layered).\nlayer_size(0,1).\nlayer_size(1,1).\nlayer_size(2,2).\nin_layer(0,n1).\nin_layer(1,n2).\nin_layer(2,n3).\nin_layer(2,n4).\nedge(n1,n2).\nedge(n2,n1).\nedge(n1,n4).\nedge(n4,n1).\nedge(n2,n3).\nedge(n3,n2)."
+},
+{
+  "problem_name": "layered_graph",
+  "text": "The graph has two layers. Layer 0 has a size of 2 and contains n1 and n2. Layer 1 has a size of 3 and contains n3, n4, and n5. Every node in layer 0 is connected to every node in layer 1.",
+  "output": "type(layered).\nlayer_size(0,2).\nlayer_size(1,3).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(1,n3).\nin_layer(1,n4).\nin_layer(1,n5).\nedge(n1,n3).\nedge(n3,n1).\nedge(n1,n4).\nedge(n4,n1).\nedge(n1,n5).\nedge(n5,n1).\nedge(n2,n3).\nedge(n3,n2).\nedge(n2,n4).\nedge(n4,n2).\nedge(n2,n5).\nedge(n5,n2)."
+},
+{
+  "problem_name": "layered_graph",
+  "text": "There are three layers. Layer 0 (size 2) consists of n1 and n2. Layer 1 (size 1) consists of n3. Layer 2 (size 2) consists of n4 and n5. The central node n3 is connected to all nodes in layer 0 and all nodes in layer 2.",
+  "output": "type(layered).\nlayer_size(0,2).\nlayer_size(1,1).\nlayer_size(2,2).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(1,n3).\nin_layer(2,n4).\nin_layer(2,n5).\nedge(n3,n1).\nedge(n1,n3).\nedge(n3,n2).\nedge(n2,n3).\nedge(n3,n4).\nedge(n4,n3).\nedge(n3,n5).\nedge(n5,n3)."
+},
+{
+  "problem_name": "layered_graph",
+  "text": "The graph contains three layers with 2 nodes each. Layer 0 has n1 and n2, layer 1 has n3 and n4, and layer 2 has n5 and n6. A path exists starting at n1, connecting to n3, then to n6. Another path starts at n2, links to n4, and ends at n5. Finally, n1 and n2 are connected.",
+  "output": "type(layered).\nlayer_size(0,2).\nlayer_size(1,2).\nlayer_size(2,2).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(1,n3).\nin_layer(1,n4).\nin_layer(2,n5).\nin_layer(2,n6).\nedge(n1,n3).\nedge(n3,n1).\nedge(n3,n6).\nedge(n6,n3).\nedge(n2,n4).\nedge(n4,n2).\nedge(n4,n5).\nedge(n5,n4).\nedge(n1,n2).\nedge(n2,n1)."
+},
+{
+  "problem_name": "layered_graph",
+  "text": "In this network, node n10 is the central hub. It is connected to nodes n11, n12, n13, and n14. No other connections exist.",
+  "output": "type(unlayered).\nedge(n10,n11).\nedge(n11,n10).\nedge(n10,n12).\nedge(n12,n10).\nedge(n10,n13).\nedge(n13,n10).\nedge(n10,n14).\nedge(n14,n10)."
+},
+{
+  "problem_name": "layered_graph",
+  "text": "The graph forms a ring. There is an edge between n1 and n2, n2 and n3, and n3 and n4. Finally, n4 is connected back to n1.",
+  "output": "type(unlayered).\nedge(n1,n2).\nedge(n2,n1).\nedge(n2,n3).\nedge(n3,n2).\nedge(n3,n4).\nedge(n4,n3).\nedge(n4,n1).\nedge(n1,n4)."
+},
+{
+  "problem_name": "layered_graph",
+  "text": "Nodes n100 and n101 are connected to each other. Separately, node n200 is linked to n201 and n202.",
+  "output": "type(unlayered).\nedge(n100,n101).\nedge(n101,n100).\nedge(n200,n201).\nedge(n201,n200).\nedge(n200,n202).\nedge(n202,n200)."
+},
+{
+  "problem_name": "layered_graph",
+  "text": "Nodes n1, n2, and n3 are all connected to one another, forming a triangle. Additionally, n3 is connected to node n4.",
+  "output": "type(unlayered).\nedge(n1,n2).\nedge(n2,n1).\nedge(n2,n3).\nedge(n3,n2).\nedge(n1,n3).\nedge(n3,n1).\nedge(n3,n4).\nedge(n4,n3)."
+},
+{
+  "problem_name": "layered_graph",
+  "text": "Nodes n5, n6, and n7 are all linked to a common node, n8. Furthermore, n5 and n6 share a direct connection.",
+  "output": "type(unlayered).\nedge(n5,n8).\nedge(n8,n5).\nedge(n6,n8).\nedge(n8,n6).\nedge(n7,n8).\nedge(n8,n7).\nedge(n5,n6).\nedge(n6,n5)."
+},
+{
+  "problem_name": "layered_graph",
+  "text": "Nodes n10 and n20 are mutually connected. Meanwhile, n30 is connected to n10 and n40. Finally, there is an edge between n20 and n40.",
+  "output": "type(unlayered).\nedge(n10,n20).\nedge(n20,n10).\nedge(n30,n10).\nedge(n10,n30).\nedge(n30,n40).\nedge(n40,n30).\nedge(n20,n40).\nedge(n40,n20)."
+},
+{
+  "problem_name": "layered_graph",
+  "text": "The graph has three layers. Layer 0 has size 1 (n1), layer 1 has size 2 (n2, n3), and layer 2 has size 1 (n4). Node n1 is connected to both nodes in layer 1, and both nodes in layer 1 are connected to n4.",
+  "output": "type(layered).\nlayer_size(0,1).\nlayer_size(1,2).\nlayer_size(2,1).\nin_layer(0,n1).\nin_layer(1,n2).\nin_layer(1,n3).\nin_layer(2,n4).\nedge(n1,n2).\nedge(n2,n1).\nedge(n1,n3).\nedge(n3,n1).\nedge(n2,n4).\nedge(n4,n2).\nedge(n3,n4).\nedge(n4,n3)."
+},
+{
+  "problem_name": "layered_graph",
+  "text": "There are three layers of size 2. Layer 0: n1, n2. Layer 1: n3, n4. Layer 2: n5, n6. Node n1 connects to n3, which connects to n5. Similarly, n2 connects to n4, which connects to n6.",
+  "output": "type(layered).\nlayer_size(0,2).\nlayer_size(1,2).\nlayer_size(2,2).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(1,n3).\nin_layer(1,n4).\nin_layer(2,n5).\nin_layer(2,n6).\nedge(n1,n3).\nedge(n3,n1).\nedge(n3,n5).\nedge(n5,n3).\nedge(n2,n4).\nedge(n4,n2).\nedge(n4,n6).\nedge(n6,n4)."
+},
+{
+  "problem_name": "layered_graph",
+  "text": "The graph has two layers. Layer 0 (size 3) contains n1, n2, n3. Layer 1 (size 1) contains n4. All nodes in layer 0 are linked to n4.",
+  "output": "type(layered).\nlayer_size(0,3).\nlayer_size(1,1).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(0,n3).\nin_layer(1,n4).\nedge(n1,n4).\nedge(n4,n1).\nedge(n2,n4).\nedge(n4,n2).\nedge(n3,n4).\nedge(n4,n3)."
+},
+{
+  "problem_name": "layered_graph",
+  "text": "Nodes n10 and n11 are connected, as are n12 and n13. Furthermore, n10 is connected to n12, and n11 is connected to n13.",
+  "output": "type(unlayered).\nedge(n10,n11).\nedge(n11,n10).\nedge(n12,n13).\nedge(n13,n12).\nedge(n10,n12).\nedge(n12,n10).\nedge(n11,n13).\nedge(n13,n11)."
+},
+{
+  "problem_name": "layered_graph",
+  "text": "Node alpha is connected to nodes beta and gamma. Node delta is also connected to beta and gamma.",
+  "output": "type(unlayered).\nedge(alpha,beta).\nedge(beta,alpha).\nedge(alpha,gamma).\nedge(gamma,alpha).\nedge(delta,beta).\nedge(beta,delta).\nedge(delta,gamma).\nedge(gamma,delta)."
+},
+{
+  "problem_name": "layered_graph",
+  "text": "A path moves through nodes n1, n2, n3, and n4 in order, where each node is connected to the next one in the sequence.",
+  "output": "type(unlayered).\nedge(n1,n2).\nedge(n2,n1).\nedge(n2,n3).\nedge(n3,n2).\nedge(n3,n4).\nedge(n4,n3)."
+},
+{
+    "problem_name": "layered_graph",
+    "text": "The graph has six layers (0 to 5). Layers 0, 2, and 4 have 1 node each (n0, n2, n4). Layers 1, 3, and 5 have 3 nodes each: layer 1 has n1a, n1b, n1c; layer 3 has n3a, n3b, n3c; and layer 5 has n5a, n5b, n5c. Every node in an even-numbered layer is connected to all nodes in the subsequent odd-numbered layer.",
+    "output": "type(layered).\nlayer_size(0,1).\nlayer_size(1,3).\nlayer_size(2,1).\nlayer_size(3,3).\nlayer_size(4,1).\nlayer_size(5,3).\nin_layer(0,n0).\nin_layer(1,n1a).\nin_layer(1,n1b).\nin_layer(1,n1c).\nin_layer(2,n2).\nin_layer(3,n3a).\nin_layer(3,n3b).\nin_layer(3,n3c).\nin_layer(4,n4).\nin_layer(5,n5a).\nin_layer(5,n5b).\nin_layer(5,n5c).\nedge(n0,n1a).\nedge(n1a,n0).\nedge(n0,n1b).\nedge(n1b,n0).\nedge(n0,n1c).\nedge(n1c,n0).\nedge(n2,n3a).\nedge(n3a,n2).\nedge(n2,n3b).\nedge(n3b,n2).\nedge(n2,n3c).\nedge(n3c,n2).\nedge(n4,n5a).\nedge(n5a,n4).\nedge(n4,n5b).\nedge(n5b,n4).\nedge(n4,n5c).\nedge(n5c,n4)."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "A 5-layer graph where each layer is defined to have 4 nodes. Layer 0 contains n1, n2, n3, n4. Layer 1 contains n5 and n6. Layer 2 contains n7, n8, n9, n10. Layer 3 contains n11. Layer 4 is completely empty. Node n1 is linked to n11, and n4 is connected to n7.",
+    "output": "type(layered).\nlayer_size(0,4).\nlayer_size(1,4).\nlayer_size(2,4).\nlayer_size(3,4).\nlayer_size(4,4).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(0,n3).\nin_layer(0,n4).\nin_layer(1,n5).\nin_layer(1,n6).\nin_layer(2,n7).\nin_layer(2,n8).\nin_layer(2,n9).\nin_layer(2,n10).\nin_layer(3,n11).\nwarning(unmatched_layer_size, (1,4,2)).\nwarning(unmatched_layer_size, (3,4,1)).\nwarning(unmatched_layer_size, (4,4,0))."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "Nodes n1 through n7 form a complex unlayered mesh. n1 is connected to n2, n3, and n4. n2 and n3 are connected to n5. n4 is linked to n6 and n7. Finally, n5, n6, and n7 are all mutually connected to one another.",
+    "output": "type(unlayered).\nedge(n1,n2).\nedge(n2,n1).\nedge(n1,n3).\nedge(n3,n1).\nedge(n1,n4).\nedge(n4,n1).\nedge(n2,n5).\nedge(n5,n2).\nedge(n3,n5).\nedge(n5,n3).\nedge(n4,n6).\nedge(n6,n4).\nedge(n4,n7).\nedge(n7,n4).\nedge(n5,n6).\nedge(n6,n5).\nedge(n5,n7).\nedge(n7,n5).\nedge(n6,n7).\nedge(n7,n6)."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "The graph has three layers. Layer 0 (size 5) contains n1, n2, n3, n4, and n5. Layer 1 (size 1) contains hub_node. Layer 2 (size 5) contains m1, m2, m3, m4, and m5. The hub_node is connected to every single node in layer 0 and every single node in layer 2.",
+    "output": "type(layered).\nlayer_size(0,5).\nlayer_size(1,1).\nlayer_size(2,5).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(0,n3).\nin_layer(0,n4).\nin_layer(0,n5).\nin_layer(1,hub_node).\nin_layer(2,m1).\nin_layer(2,m2).\nin_layer(2,m3).\nin_layer(2,m4).\nin_layer(2,m5).\nedge(hub_node,n1).\nedge(n1,hub_node).\nedge(hub_node,n2).\nedge(n2,hub_node).\nedge(hub_node,n3).\nedge(n3,hub_node).\nedge(hub_node,n4).\nedge(n4,hub_node).\nedge(hub_node,n5).\nedge(n5,hub_node).\nedge(hub_node,m1).\nedge(m1,hub_node).\nedge(hub_node,m2).\nedge(m2,hub_node).\nedge(hub_node,m3).\nedge(m3,hub_node).\nedge(hub_node,m4).\nedge(m4,hub_node).\nedge(hub_node,m5).\nedge(m5,hub_node)."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "This unlayered graph represents a double-ring structure. The first ring connects n1, n2, and n3 in a cycle. The second ring connects n4, n5, and n6 in a cycle. Node n3 and n4 are connected to bridge the two rings.",
+    "output": "type(unlayered).\nedge(n1,n2).\nedge(n2,n1).\nedge(n2,n3).\nedge(n3,n2).\nedge(n3,n1).\nedge(n1,n3).\nedge(n4,n5).\nedge(n5,n4).\nedge(n5,n6).\nedge(n6,n5).\nedge(n6,n4).\nedge(n4,n6).\nedge(n3,n4).\nedge(n4,n3)."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "Layer 0 has 4 nodes: n1, n2, n3, n4. Layer 1 has 2 nodes: n5, n6. Layer 2 has 4 nodes, but only n7 and n8 are mentioned. Layer 0 size is 4, Layer 1 size is 2, and Layer 2 size is 4. n1 connects to n5 and n8.",
+    "output": "type(layered).\nlayer_size(0,4).\nlayer_size(1,2).\nlayer_size(2,4).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(0,n3).\nin_layer(0,n4).\nin_layer(1,n5).\nin_layer(1,n6).\nin_layer(2,n7).\nin_layer(2,n8).\nwarning(unmatched_layer_size, (2,4,2))."
+  },
+{
+    "problem_name": "layered_graph",
+    "text": "A massive 6-layer architecture. Layer 0 (size 3) has a1, a2, a3. Layer 1 (size 6) has b1, b2, b3, b4, b5, b6. Layer 2 (size 2) has c1, c2. Layer 3 (size 6) has d1, d2, d3, d4, d5, d6. Layer 4 (size 3) has e1, e2, e3. Layer 5 (size 1) has f1. Every node in layer 0 is connected to every node in layer 1. Every node in layer 4 is connected to the single node in layer 5. Additionally, c1 is connected to b1 and d1, while c2 is connected to b6 and d6.",
+    "output": "type(layered).\nlayer_size(0,3).\nlayer_size(1,6).\nlayer_size(2,2).\nlayer_size(3,6).\nlayer_size(4,3).\nlayer_size(5,1).\nin_layer(0,a1).\nin_layer(0,a2).\nin_layer(0,a3).\nin_layer(1,b1).\nin_layer(1,b2).\nin_layer(1,b3).\nin_layer(1,b4).\nin_layer(1,b5).\nin_layer(1,b6).\nin_layer(2,c1).\nin_layer(2,c2).\nin_layer(3,d1).\nin_layer(3,d2).\nin_layer(3,d3).\nin_layer(3,d4).\nin_layer(3,d5).\nin_layer(3,d6).\nin_layer(4,e1).\nin_layer(4,e2).\nin_layer(4,e3).\nin_layer(5,f1).\nedge(a1,b1).\nedge(b1,a1).\nedge(a1,b2).\nedge(b2,a1).\nedge(a1,b3).\nedge(b3,a1).\nedge(a1,b4).\nedge(b4,a1).\nedge(a1,b5).\nedge(b5,a1).\nedge(a1,b6).\nedge(b6,a1).\nedge(a2,b1).\nedge(b1,a2).\nedge(a2,b2).\nedge(b2,a2).\nedge(a2,b3).\nedge(b3,a2).\nedge(a2,b4).\nedge(b4,a2).\nedge(a2,b5).\nedge(b5,a2).\nedge(a2,b6).\nedge(b6,a2).\nedge(a3,b1).\nedge(b1,a3).\nedge(a3,b2).\nedge(b2,a3).\nedge(a3,b3).\nedge(b3,a3).\nedge(a3,b4).\nedge(b4,a3).\nedge(a3,b5).\nedge(b5,a3).\nedge(a3,b6).\nedge(b6,a3).\nedge(e1,f1).\nedge(f1,e1).\nedge(e2,f1).\nedge(f1,e2).\nedge(e3,f1).\nedge(f1,e3).\nedge(c1,b1).\nedge(b1,c1).\nedge(c1,d1).\nedge(d1,c1).\nedge(c2,b6).\nedge(b6,c2).\nedge(c2,d6).\nedge(d6,c2)."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "The graph defines 7 layers (0-6) with a uniform size of 5. However, the data is sparse. Layer 0 contains x1, x2, x3. Layer 2 contains y1. Layer 4 contains z1, z2. Layer 6 contains w1, w2, w3, w4, w5. All other layers (1, 3, 5) are empty. Node x1 is connected to w1.",
+    "output": "type(layered).\nlayer_size(0,5).\nlayer_size(1,5).\nlayer_size(2,5).\nlayer_size(3,5).\nlayer_size(4,5).\nlayer_size(5,5).\nlayer_size(6,5).\nin_layer(0,x1).\nin_layer(0,x2).\nin_layer(0,x3).\nin_layer(2,y1).\nin_layer(4,z1).\nin_layer(4,z2).\nin_layer(6,w1).\nin_layer(6,w2).\nin_layer(6,w3).\nin_layer(6,w4).\nin_layer(6,w5).\nwarning(unmatched_layer_size, (0,5,3)).\nwarning(unmatched_layer_size, (1,5,0)).\nwarning(unmatched_layer_size, (2,5,1)).\nwarning(unmatched_layer_size, (3,5,0)).\nwarning(unmatched_layer_size, (4,5,2)).\nwarning(unmatched_layer_size, (5,5,0))."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "An unlayered 'web' graph. A central core group consisting of c1, c2, c3, and c4 are all mutually connected. This core connects to four external satellites: s1 is connected to c1, s2 to c2, s3 to c3, and s4 to c4. Furthermore, each satellite is connected to its clockwise neighbor (s1 to s2, s2 to s3, s3 to s4, and s4 back to s1).",
+    "output": "type(unlayered).\nedge(c1,c2).\nedge(c2,c1).\nedge(c1,c3).\nedge(c3,c1).\nedge(c1,c4).\nedge(c4,c1).\nedge(c2,c3).\nedge(c3,c2).\nedge(c2,c4).\nedge(c4,c2).\nedge(c3,c4).\nedge(c4,c3).\nedge(s1,c1).\nedge(c1,s1).\nedge(s2,c2).\nedge(c2,s2).\nedge(s3,c3).\nedge(c3,s3).\nedge(s4,c4).\nedge(c4,s4).\nedge(s1,s2).\nedge(s2,s1).\nedge(s2,s3).\nedge(s3,s2).\nedge(s3,s4).\nedge(s4,s3).\nedge(s4,s1).\nedge(s1,s4)."
+  },
+  {
+    "problem_name": "layered_graph",
+    "text": "Two-layer graph with extreme density. Layer 0 has size 10 (n0, n1, n2, n3, n4, n5, n6, n7, n8, n9) and Layer 1 has size 2 (m0, m1). Every even-numbered node in layer 0 is connected to m0, and every odd-numbered node in layer 0 is connected to m1.",
+    "output": "type(layered).\nlayer_size(0,10).\nlayer_size(1,2).\nin_layer(0,n0).\nin_layer(0,n1).\nin_layer(0,n2).\nin_layer(0,n3).\nin_layer(0,n4).\nin_layer(0,n5).\nin_layer(0,n6).\nin_layer(0,n7).\nin_layer(0,n8).\nin_layer(0,n9).\nin_layer(1,m0).\nin_layer(1,m1).\nedge(n0,m0).\nedge(m0,n0).\nedge(n2,m0).\nedge(m0,n2).\nedge(n4,m0).\nedge(m0,n4).\nedge(n6,m0).\nedge(m0,n6).\nedge(n8,m0).\nedge(m0,n8).\nedge(n1,m1).\nedge(m1,n1).\nedge(n3,m1).\nedge(m1,n3).\nedge(n5,m1).\nedge(m1,n5).\nedge(n7,m1).\nedge(m1,n7).\nedge(n9,m1).\nedge(m1,n9)."
+  }
+]

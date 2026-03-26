@@ -1,0 +1,55 @@
+context: null
+strings:
+- nomystery_description: |
+    Locations are connected by weighted edges.
+    Being at a location and having a fuel amount are state properties.
+    Traversing an edge consumes fuel according to its cost.
+    All goal locations must be reached within the available fuel.
+
+
+extract:
+- at(object, location): 
+    prompt: |
+        {nomystery_description} 
+        
+        Identify the starting positions of all entities (trucks, packages, etc.).
+        For each 'object', specify its initial 'location'.
+
+- fuel(truck, quantity): 
+    prompt: |
+        {nomystery_description} 
+        
+        Identify the starting fuel levels for all trucks.
+        For each 'truck', specify the initial 'quantity' of fuel as an integer.
+
+- fuelcost(cost, source, target): 
+    prompt: |
+        {nomystery_description} 
+        
+        Identify the connections between locations and how much fuel they consume.
+        For each path, extract the 'source' (starting location), the 'target' (destination), and the 'cost' (the integer amount of fuel required).
+
+- goal(package, location):
+    prompt: |
+        {nomystery_description} 
+        
+        Identify the delivery requirements for all packages.
+        For each 'package', specify the final 'location' it must be delivered to.
+
+- steps(value): 
+    prompt: |
+        {nomystery_description} 
+        
+        Identify the plan length or step limit.
+        The "value" is the total number of steps or actions allowed to solve the problem (an integer).
+
+
+knowledge_base: |
+        #show at/2.
+        #show fuel/2.
+        #show fuelcost/3.
+        #show goal/2.
+
+        step(1..N) :- steps(N).
+        #show step/1.
+

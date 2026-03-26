@@ -1,0 +1,83 @@
+context: null
+
+strings:
+- sokoban_description: |
+    A warehouse grid contains a player and stones occupying floor cells.
+    Movement is directional across adjacent locations.
+    A stone can be pushed only if the next cell is clear.
+    Goal stones must eventually be placed on designated storage (goal) cells.
+
+
+extract:
+- at(object, position):          
+    prompt: |
+        {sokoban_description} 
+        
+        Identify the starting locations of the movable elements.
+        For each 'object' (either "sokoban" for the player or "stone" for a box), specify its initial 'position' cell name (e.g., pos_1_1).
+        
+- clear(location):
+    prompt: |
+        {sokoban_description} 
+        
+        Identify all grid cells that are currently unoccupied.
+        For each empty cell, provide the 'location' identifier (an unquoted string).
+
+- isgoal(location): 
+    prompt: |
+        {sokoban_description} 
+        
+        Identify all target locations where stones must be placed.
+        For each goal square, provide its 'location' identifier (an unquoted string).
+
+- isnongoal(location): 
+    prompt: |
+        {sokoban_description} 
+        
+        Identify all floor locations that are NOT designated as goal squares.
+        For each non-goal cell, provide its 'location' identifier (an unquoted string).
+
+- goal(stone): 
+    prompt: |
+        {sokoban_description} 
+        
+        Identify which specific stones or boxes are required to be moved to goal positions.
+        For each required stone, provide its identifier (an unquoted string).
+
+- player(id): 
+    prompt: |
+        {sokoban_description} 
+        
+        Identify the unique identifier for the player character (the sokoban).
+        The "id" is the name or string used to represent the person moving the stones.
+
+- steps(value): 
+    prompt: |
+        {sokoban_description} 
+        
+        Identify the total number of actions allowed to solve the puzzle.
+        The "value" is the step limit or maximum move count (an integer).
+
+- movedir(source, target, direction): 
+    prompt: |
+        {sokoban_description} 
+        
+        Define the adjacency and direction between all connected grid cells.
+        For every pair of adjacent cells, specify the 'source' (starting cell), the 'target' (destination cell), and the 'direction' required to move from source to target.
+        
+        The 'direction' must be one of the following: dir_up, dir_down, dir_left, dir_right.
+          
+
+knowledge_base: |
+        #show at/2.
+        #show clear/1.
+        #show isgoal/1.
+        #show isnongoal/1.
+        #show goal/1.
+        #show player/1.
+
+        step(I) :- steps(N), I = 1..N.
+        #show step/1.
+        
+        #show move_dir/3.
+        

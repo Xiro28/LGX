@@ -1,22 +1,28 @@
 [tool.poetry]
 name = "lgx"
 version = "0.1.0"
-description = "Logic guided LLM inference"
-authors = ["Xiro28 <grillo383@gmail.com>"]
+description = ""
+authors = ["Lorenzo"]
 readme = "README.md"
+packages = [
+    { include = "src/*.py" }
+]
 
 [tool.poetry.dependencies]
-python = "^3.13"
-rich = "^14.3.2"
-typechecked = "^0.11.1"
-typeguard = "^4.5.0"
+python = "^3.12"
 ollama = "^0.6.1"
-dumbo-asp = "^0.4.0"
-pytest = "^9.0.2"
-pytest-mock = "^3.15.1"
-pyaml = "^26.2.1"
+pyyaml = "^6.0.3"
+typeguard = "^4.4.4"
+dumbo-asp = "^0.3.17"
+streamlit = "^1.53.0"
+pandas = "^2.3.3"
+plotly = "^6.5.2"
+matplotlib = "^3.10.8"
+tqdm = "^4.67.1"
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+
