@@ -2,7 +2,5 @@
 __pycache__/
 
 .DS_Store
-
 poetry.lock
-
-cached_prompts.db
+cached_prompt.db
