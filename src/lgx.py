@@ -15,7 +15,7 @@ from src.core.predicate.predicate_container import PredicateContainer
 
 @typechecked
 @dataclass
-class LLMASP:
+class LGX:
     __behaviour_config_filename:   str = field(init=True, default="")
     __application_config_filename: str = field(init=True, default="")
     
@@ -41,12 +41,12 @@ class LLMASP:
     def __load_config__(self, path: str) -> dict | list:
         return yaml.load(open(path, "r"), Loader=yaml.Loader)
     
-    def infer(self, prompt:str, mode:str) -> "LLMASP":
+    def infer(self, prompt:str, mode:str) -> "LGX":
         self.__extracted_preds = self.evaluator.run(prompt, mode)
         self.__total_extracted_pred += self.__extracted_preds
         return self
     
-    def run_asp(self) -> "LLMASP":
+    def run_asp(self) -> "LGX":
         self.__result_preds = self.extracted_preds
         if self.__application_config['knowledge_base'] and self.__total_extracted_pred != "":
             try:

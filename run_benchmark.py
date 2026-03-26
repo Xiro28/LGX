@@ -8,7 +8,7 @@ from pathlib    import Path
 from itertools  import groupby
 from typing     import Literal
 
-from src.llmasp     import LLMASP
+from src.lgx     import LGX
 
 from src.core.predicate.condition_cache     import ConditionCache
 
@@ -63,7 +63,7 @@ class BenchmarkRunner:
                 items, desc=f"Processing {problem_name}", leave=False
             ):
                 try:
-                    res = self.llmasp.infer(item["text"], self.mode)
+                    res = self.lgx.infer(item["text"], self.mode)
                     results.append(res.run_asp().inferred_preds)
 
                 except Exception:
@@ -72,7 +72,7 @@ class BenchmarkRunner:
                     )
                     results.append("TIMEOUT")
 
-                self.llmasp.clean()
+                self.lgx.clean()
 
             self.statistics[problem_name] = {
                 "results": results,
@@ -112,7 +112,7 @@ def benchmark_run(model: str, n_samples: int):
 
 # Model available: llama3.1:8b, llama3.1:70b, gpt-oss:120b
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run LLMASP Benchmarks", 
+    parser = argparse.ArgumentParser(description="Run LGX Benchmarks", 
     epilog = """Usage: python run_benchmark.py --model <model_name> [--samples <number_of_samples>] [--help]
                 Environment variables:
                 LGX_OLLAMA_URL: URL of the Ollama instance to use for the benchmark.
